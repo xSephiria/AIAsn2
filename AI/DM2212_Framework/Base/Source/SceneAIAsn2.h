@@ -94,6 +94,12 @@ protected:
 	// Ai asn2
 	GameObject* magician;
 	float magicianRechargeTimer;
+
+	GameObject* healer;
+	float healerCooldown;
+	float healerAOETimer;
+	GameObject* healingTarget;
+
 };
 
 #endif

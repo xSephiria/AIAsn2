@@ -27,7 +27,7 @@ struct GameObject
 
 		// AI asn2
 		GO_MAGICIAN,
-
+		GO_HEALER,
 		GO_TOTAL, //must be last
 	};
 
@@ -42,12 +42,24 @@ struct GameObject
 		STATE_RECOVER,
 		STATE_RECHARGE,
 		STATE_MOVE,
+		STATE_HEAL,
 		NUM_STATES
 	};
 
-	float HP;
+	enum JOB_CLASS
+	{
+		JOB_MAGICIAN,
+		JOB_HEALER,
+		JOB_WARRIOR,
+		JOB_ARCHER,
+		JOB_NONE,
+		NUM_JOB
+	};
+
+	int HP;
 	GAMEOBJECT_TYPE type;
-	STATES currentState = STATE_IDLE;
+	STATES currentState;
+	JOB_CLASS job;
 	Vector3 pos;
 	Vector3 vel;
 	Vector3 scale;

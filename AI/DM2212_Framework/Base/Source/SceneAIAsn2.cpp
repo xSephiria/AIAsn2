@@ -30,16 +30,27 @@ void SceneAIAsn2::Init()
 	playerHP = 100;
 
 
+
+	gs = STAGEFINAL;
+	tempGS = STAGE1;
+
 	magician = FetchGO();
 	magician->type = GameObject::GO_MAGICIAN;
 	magician->pos.Set(0, 10, 0);
 	magician->vel.Set(10,0,0);
 	magician->scale.Set(5, 5, 5);
+	magician->job = GameObject::JOB_MAGICIAN;
 	magicianRechargeTimer = 0.f;
 
-	gs = STAGEFINAL;
-	tempGS = STAGE1;
-
+	healer = FetchGO();
+	healer->type = GameObject::GO_HEALER;
+	healer->pos.Set(0, 10, 0);
+	healer->vel.Set(5, 0, 0);
+	healer->scale.Set(5, 5, 5);
+	healer->job = GameObject::JOB_HEALER;
+	healerAOETimer = 0.f;
+	healerCooldown = 15.f;
+	
 	mob = FetchGO();
 	mob->type = GameObject::GO_ASTEROID;
 	mob->pos.Set(70, 10, 0);
@@ -85,69 +96,25 @@ void SceneAIAsn2::Update(double dt)
 {
 	if (Application::IsKeyPressed(VK_ESCAPE))
 		quitGame = true;
-	if (gs == DEAD)
-	{
-		if (Application::IsKeyPressed(VK_RETURN))
-		{
-			playerHP = 100;
-			m_lives -= 1;
-			m_ship->pos.Set(m_worldWidth / 2, 5, 0);
-			m_ship->vel.SetZero();
-			rotateShip = 0;
-			m_ship->active = true;
-			gs = tempGS;
-		}
-		return;
-	}
-	if (gs == GAME_OVER)
-	{
-		if (Application::IsKeyPressed(VK_RETURN))
-		{
-			m_lives = 3;
-			m_score = 0;
-			playerHP = 100;
-			m_ship->pos.Set(m_worldWidth / 2, 5, 0);
-			m_ship->vel.SetZero();
-			rotateShip = 0;
-			m_ship->active = true;
-			gs = STAGEFINAL;
-		}
-		return;
-	}
-	if (gs == VICTORY)
-	{
-		if (Application::IsKeyPressed(VK_RETURN))
-			gs = STAGEFINAL;
-		return;
-	}
 	SceneBase::Update(dt);
 
-	// Rotate ship
-	Vector3 acceleration(0, 0, 0);
-
-	/*shipRotation.SetToRotation(rotateShip, 0, 0, 1);
-	if (m_ship->mass > Math::EPSILON)
-		acceleration = m_force * (1.f / m_ship->mass);
-
-	m_ship->vel += shipRotation * acceleration * (float)dt;
-	m_ship->pos += m_ship->vel * (float)dt;
-
-	if (m_ship->vel.LengthSquared() > (MAX_SPEED)* (MAX_SPEED))
-	{
-		m_ship->vel.Normalize() *= MAX_SPEED;
-	}*/
 
 	if (gs == STAGEFINAL)
 	{
 		if (magician->active) // Magician codes here
 		{
-			if (DistXY(magician->pos, mob->pos) < 200.f && mob->active)
+			if (magician->currentState == GameObject::STATE_MOVE)
 			{
-				if (magicianRechargeTimer <= 0.f)
-					magician->currentState = GameObject::STATE_ATTACK;
-				magician->vel.SetZero();
+				if (DistXY(magician->pos, mob->pos) < 200.f && mob->active)
+				{
+					if (magicianRechargeTimer <= 0.f)
+						magician->currentState = GameObject::STATE_ATTACK;
+					magician->vel.SetZero();
+				}
+				else
+					magician->vel.Set(10, 0, 0);
 			}
-			if (magician->currentState == GameObject::STATE_ATTACK)
+			else if (magician->currentState == GameObject::STATE_ATTACK)
 			{
 				if (magicianRechargeTimer <= 0.f)
 				{
@@ -161,7 +128,7 @@ void SceneAIAsn2::Update(double dt)
 					magician->currentState = GameObject::STATE_RECHARGE;
 				}
 			}
-			if (magician->currentState == GameObject::STATE_RECHARGE)
+			else if (magician->currentState == GameObject::STATE_RECHARGE)
 			{
 				magicianRechargeTimer -= dt;
 				if (magicianRechargeTimer <= 0.f)
@@ -171,83 +138,57 @@ void SceneAIAsn2::Update(double dt)
 			}
 		}
 		
-	}
-
-	if (gs != DEAD && playerHP <= 0)
-	{
-		tempGS = gs;
-		m_ship->active = false;
-		for (auto go : m_goList)
+		// Healer Codes here
+		if (healer->active)
 		{
-			go->active = false;
+			GameObject* healingTarget;
+			healerAOETimer -= dt;
+			if (healerAOETimer <= 0.f && healer->currentState != GameObject::STATE_HEAL)
+			{
+				for (auto go : m_goList)
+				{
+					if (go->job == GameObject::JOB_NONE || go->active == false)
+						continue;
+					if (DistXY(healer->pos, go->pos) < 400.f)
+					{
+						if (go->HP <= 100 && go->HP >= 70)
+							go->HP = 100;
+						else
+							go->HP += 30;
+					}
+				}
+			}
+			if (healer->currentState == GameObject::STATE_MOVE)
+			{
+				for (auto go : m_goList)
+				{
+					if (go->job == GameObject::JOB_NONE || go->active == false)
+						continue;
+					if (go->HP < 30)
+					{
+						healer->currentState = GameObject::STATE_HEAL;
+						healingTarget = go;
+					}
+				}
+				healer->vel.Set(5, 0, 0);
+			}
+			else if (healer->currentState == GameObject::STATE_HEAL)
+			{
+				if (DistXY(healer->pos, healingTarget->pos) < 200 && healerCooldown <= 0.f)
+				{
+					healer->vel.SetZero();
+					healingTarget->HP += 50;
+					healerCooldown = 5.f;
+					healingTarget = NULL;
+					healer->currentState = GameObject::STATE_MOVE;
+				}
+				healerCooldown -= dt;
+			}
 		}
-		gs = DEAD;
-	}
-	if (m_lives <= 0)
-	{
-		m_ship->active = false;
-		for (auto go : m_goList)
-		{
-			go->active = false;
-		}
-		gs = GAME_OVER;
 	}
 
 	m_force.SetZero();
-	//Exercise 6: set m_force values based on WASD
-	//if (Application::IsKeyPressed(VK_UP))
-	//{
-	//	m_force.y = 30;
-	//}
-	//if (Application::IsKeyPressed(VK_LEFT))
-	//{
-	//	rotateShip += 1.f;
-	//	//m_force.x = -100;
-	//}
-	//if (Application::IsKeyPressed(VK_DOWN))
-	//{
-	//	m_force.y = -30;
-	//}
-	//if (Application::IsKeyPressed(VK_RIGHT))
-	//{
-	//	rotateShip -= 1.f;
-	//	//m_force.x = 100;
-	//}
-	////Exercise 8: use 2 keys to increase and decrease mass of ship
-	//if (Application::IsKeyPressed(VK_OEM_MINUS))
-	//{
-	//	m_ship->mass = Math::Max(0.1f, m_ship->mass - 0.1f);
-	//}
-	//if (Application::IsKeyPressed(VK_OEM_PLUS))
-	//{
-	//	m_ship->mass = Math::Min(10.f, m_ship->mass + 0.1f);
-	//}
-
-
-	//Exercise 14: use a key to spawn a bullet
-	firingDebounce += (float)dt;
-	if (Application::IsKeyPressed('Z') && firingDebounce > 1.f / fireRate)
-	{
-
-		firingDebounce = 0;
-
-		GameObject* bulletMid = FetchGO();
-		bulletMid->type = GameObject::GO_BULLET;
-		bulletMid->scale = bulletSize;
-		bulletMid->pos = m_ship->pos;
-
-
-		//Exercise 15: limit the spawn rate of bullets
-		if (m_ship->vel.IsZero())
-		{
-			bulletMid->vel = shipRotation * Vector3(0, 30, 0);
-		}
-		else
-		{
-			Vector3 direction = Vector3(0, abs(atan2(m_ship->vel.y, m_ship->vel.x)), 0);
-			bulletMid->vel = shipRotation * direction * BULLET_SPEED;
-		}
-	}
+	
 	//Mouse Section
 	static bool bLButtonState = false;
 	if (!bLButtonState && Application::IsMousePressed(0))
@@ -274,16 +215,6 @@ void SceneAIAsn2::Update(double dt)
 
 	//Physics Simulation Section
 
-	//Exercise 9: wrap ship position if it leaves screen
-	/*if (m_ship->pos.x > m_worldWidth)
-		m_ship->pos.x -= m_worldWidth;
-	if (m_ship->pos.x < 0)
-		m_ship->pos.x += m_worldWidth;
-	if (m_ship->pos.y > m_worldHeight)
-		m_ship->pos.y -= m_worldHeight;
-	if (m_ship->pos.y < 0)
-		m_ship->pos.y += m_worldHeight;
-*/
 	// Collision checks here
 	for (auto go : m_goList)
 	{
@@ -308,7 +239,9 @@ void SceneAIAsn2::Update(double dt)
 							float combinedRadiusSquared = (go->scale.x + other->scale.x) * (go->scale.x + other->scale.x);
 							if (distanceSquared < combinedRadiusSquared)
 							{
-								other->active = false;
+								other->HP -= 20;
+								if (other->HP <= 0)
+									other->active = false;
 								go->active = false;
 								break;
 							}

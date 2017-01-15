@@ -7,7 +7,9 @@ GameObject::GameObject(Color color, GAMEOBJECT_TYPE typeValue)
 	scale(1, 1, 1),
 	active(false),
 	mass(1.f),
-	currentState(STATE_MOVE)
+	currentState(STATE_MOVE),
+	job(JOB_NONE),
+	HP(100)
 {
 	this->color.Set(color.r, color.g, color.b);
 }
@@ -17,7 +19,9 @@ GameObject::GameObject(GAMEOBJECT_TYPE typeValue)
 	scale(1, 1, 1),
 	active(false),
 	mass(1.f),
-	currentState(STATE_MOVE)
+	currentState(STATE_MOVE),
+	job(JOB_NONE),
+	HP(100)
 {
 }
 
