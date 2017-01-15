@@ -42,8 +42,7 @@ void SceneAIAsn2::Init()
 
 	mob = FetchGO();
 	mob->type = GameObject::GO_ASTEROID;
-	mob->pos.Set(10, 50, 0);
-	//mob->vel.Set(0,10,0);
+	mob->pos.Set(70, 10, 0);
 	mob->scale.Set(5, 5, 1);
 	mobHP = 10;
 	mobDead = false;
@@ -126,7 +125,7 @@ void SceneAIAsn2::Update(double dt)
 	// Rotate ship
 	Vector3 acceleration(0, 0, 0);
 
-	shipRotation.SetToRotation(rotateShip, 0, 0, 1);
+	/*shipRotation.SetToRotation(rotateShip, 0, 0, 1);
 	if (m_ship->mass > Math::EPSILON)
 		acceleration = m_force * (1.f / m_ship->mass);
 
@@ -136,10 +135,41 @@ void SceneAIAsn2::Update(double dt)
 	if (m_ship->vel.LengthSquared() > (MAX_SPEED)* (MAX_SPEED))
 	{
 		m_ship->vel.Normalize() *= MAX_SPEED;
-	}
+	}*/
 
 	if (gs == STAGEFINAL)
 	{
+		if (magician->active) // Magician codes here
+		{
+			if (DistXY(magician->pos, mob->pos) < 200.f && mob->active)
+			{
+				if (magicianRechargeTimer <= 0.f)
+					magician->currentState = GameObject::STATE_ATTACK;
+				magician->vel.SetZero();
+			}
+			if (magician->currentState == GameObject::STATE_ATTACK)
+			{
+				if (magicianRechargeTimer <= 0.f)
+				{
+					GameObject* fireball = FetchGO();
+					fireball->type = GameObject::GO_BULLET;
+					fireball->pos = magician->pos;
+					fireball->scale = bulletSize;
+					fireball->vel.Set(5, 0, 0);
+					fireball->active = true;
+					magicianRechargeTimer = 2.f;
+					magician->currentState = GameObject::STATE_RECHARGE;
+				}
+			}
+			if (magician->currentState == GameObject::STATE_RECHARGE)
+			{
+				magicianRechargeTimer -= dt;
+				if (magicianRechargeTimer <= 0.f)
+				{
+					magician->currentState = GameObject::STATE_MOVE;
+				}
+			}
+		}
 		
 	}
 
@@ -245,7 +275,7 @@ void SceneAIAsn2::Update(double dt)
 	//Physics Simulation Section
 
 	//Exercise 9: wrap ship position if it leaves screen
-	if (m_ship->pos.x > m_worldWidth)
+	/*if (m_ship->pos.x > m_worldWidth)
 		m_ship->pos.x -= m_worldWidth;
 	if (m_ship->pos.x < 0)
 		m_ship->pos.x += m_worldWidth;
@@ -253,41 +283,15 @@ void SceneAIAsn2::Update(double dt)
 		m_ship->pos.y -= m_worldHeight;
 	if (m_ship->pos.y < 0)
 		m_ship->pos.y += m_worldHeight;
-
-
+*/
+	// Collision checks here
 	for (auto go : m_goList)
 	{
 		if (go->active)
 		{
 			go->pos += go->vel* (float)dt;
-			//Exercise 12: handle collision between GO_SHIP and GO_ASTEROID using simple distance-based check
-			if (go->type == GameObject::GO_ASTEROID)
-			{
-				if (go->active == true)
-				{
-					float distanceSquared = ((m_ship->pos - go->pos).LengthSquared());
-					float combinedRadiusSquared = (go->scale.x + m_ship->scale.x) * (go->scale.x + m_ship->scale.x);
-					if (distanceSquared < combinedRadiusSquared)
-					{
-						playerHP -= 2;
-						go->active = false;
-						break;
-					}
-					if (go->pos.x > m_worldWidth)
-						go->pos.x -= m_worldWidth;
-					if (go->pos.x < 0)
-						go->pos.x += m_worldWidth;
-					if (go->pos.y > m_worldHeight)
-						go->pos.y -= m_worldHeight;
-					if (go->pos.y < 0)
-						go->pos.y += m_worldHeight;
-				}
-				//Exercise 13: asteroids should wrap around the screen like the ship
-
-			}
-
 			//Exercise 16: unspawn bullets when they leave screen
-			else if (go->type == GameObject::GO_BULLET)
+			if (go->type == GameObject::GO_BULLET)
 			{
 				if (go->pos.x > m_worldWidth || go->pos.x < 0 || go->pos.y > m_worldHeight || go->pos.y < 0)
 				{
@@ -304,58 +308,11 @@ void SceneAIAsn2::Update(double dt)
 							float combinedRadiusSquared = (go->scale.x + other->scale.x) * (go->scale.x + other->scale.x);
 							if (distanceSquared < combinedRadiusSquared)
 							{
-								mobHP -= 2;
-								if (mobHP <= 0)
-									other->active = false;
+								other->active = false;
 								go->active = false;
-								m_score += 2;
 								break;
 							}
 						}
-					}
-				}
-				if (Boss->active == true)
-				{
-					float distanceSquared = ((Boss->pos - go->pos).LengthSquared());
-					float combinedRadiusSquared = (go->scale.x + Boss->scale.x) * (go->scale.x + Boss->scale.x);
-					if (distanceSquared < combinedRadiusSquared)
-					{
-						go->active = false;
-						bossHP -= 2;
-						break;
-					}
-				}
-			}
-			else if (go->type == GameObject::GO_BOSS)
-			{
-				if (go->active == true)
-				{
-					float distanceSquared = ((m_ship->pos - go->pos).LengthSquared());
-					float combinedRadiusSquared = (go->scale.x + m_ship->scale.x) * (go->scale.x + m_ship->scale.x);
-					if (distanceSquared < combinedRadiusSquared)
-					{
-
-						playerHP -= bossDmg;
-						if (playerHP <= 0)
-							playerHP = 0;
-						go->active = false;
-						break;
-					}
-				}
-			}
-			else if (go->type == GameObject::GO_BOSS_BULLET)
-			{
-				if (go->active == true)
-				{
-					float distanceSquared = ((m_ship->pos - go->pos).LengthSquared());
-					float combinedRadiusSquared = (go->scale.x + m_ship->scale.x) * (go->scale.x + m_ship->scale.x);
-					if (distanceSquared < combinedRadiusSquared)
-					{
-						playerHP -= bossDmg;
-						if (playerHP <= 0)
-							playerHP = 0;
-						go->active = false;
-						break;
 					}
 				}
 			}
@@ -419,6 +376,14 @@ void SceneAIAsn2::RenderGO(GameObject *go)
 		RenderMesh(meshList[GEO_BOSS_BULLET], false);
 		modelStack.PopMatrix();
 		break;
+	default:
+		modelStack.PushMatrix();
+		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
+		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
+		modelStack.Rotate(rotateShip, 0, 0, 1);
+		RenderMesh(meshList[GEO_SHIP], false);
+		modelStack.PopMatrix();
+		break;
 	}
 }
 
@@ -453,10 +418,6 @@ void SceneAIAsn2::Render()
 
 	RenderMesh(meshList[GEO_AXES], false);
 
-	if (m_ship->active)
-		RenderGO(m_ship);
-
-
 	for (std::vector<GameObject *>::iterator it = m_goList.begin(); it != m_goList.end(); ++it)
 	{
 		GameObject *go = (GameObject *)*it;
@@ -464,12 +425,6 @@ void SceneAIAsn2::Render()
 		{
 			RenderGO(go);
 		}
-	}
-
-	if (gs == STAGEFINAL && Boss->active == true)
-	{
-
-		RenderGO(Boss);
 	}
 
 	//On screen text
@@ -511,8 +466,6 @@ void SceneAIAsn2::Render()
 			ss << "Score needed to clear this stage: " << m_score << "/30";
 		else if (gs == STAGE2)
 			ss << "Score needed to clear this stage: " << m_score << "/50";
-		else if (gs == STAGEFINAL)
-			ss << "Boss HP remaining: " << bossHP << "/1000";
 		RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(1, 1, 0), 3, 10, 54);
 
 		// If dead
@@ -534,13 +487,6 @@ void SceneAIAsn2::Render()
 			ss << "Press Enter to restart the game!";
 			RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(1, 1, 0), 3, 10, 30);
 		}
-
-		if (Boss->currentState == GameObject::STATE_BUFF)
-		{
-			ss.str("");
-			ss << "Buffing! Boss Attack UP!";
-			RenderTextOnScreen(meshList[GEO_TEXT], ss.str(), Color(1, 1, 0), 3, 0, 45);
-		}
 	}
 }
 
@@ -554,11 +500,11 @@ void SceneAIAsn2::Exit()
 		delete go;
 		m_goList.pop_back();
 	}
-	if (m_ship)
+	/*if (m_ship)
 	{
 		delete m_ship;
 		m_ship = NULL;
-	}
+	}*/
 }
 
 float SceneAIAsn2::DistXY(Vector3 first, Vector3 second)
