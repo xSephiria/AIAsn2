@@ -5,95 +5,61 @@
 #include <vector>
 #include "SceneBase.h"
 
+enum UNITS{
+	WARRIOR,
+	HEALER,
+	ARCHER,
+	MAGICIAN,
+	MOB,
+	UNITS_ALL,
+};
+
+enum STATE{
+	MAINMENU,
+	GAMEPLAY,
+	LOSE,
+	WIN,
+	STATE_ALL,
+};
 
 class SceneAIAsn2 : public SceneBase
 {
-	static const int MAX_SPEED = 30;
-	static const int BULLET_SPEED = 40;
-	static const int MISSILE_SPEED = 20;
-	static const int MISSILE_POWER = 1;
-
 public:
 	SceneAIAsn2();
 	~SceneAIAsn2();
 
-	virtual void Init();
-	virtual void Update(double dt);
-	virtual void Render();
-	virtual void Exit();
-
+private:
+	void Init();
+	void Update(double dt);		
 	void RenderGO(GameObject *go);
-
+	void Render();
+	void Exit();
 	GameObject* FetchGO();
 
-	enum GameState
-	{
-		MAIN_MENU,
-		STAGE1,
-		STAGE2,
-		STAGEFINAL,
-		STAGE_1_CLEARED,
-		STAGE_2_CLEARED,
-		DEAD,
-		VICTORY,
-		GAME_OVER,
-		NUM_GS
-	};
-
-	GameState gs;
-	GameState tempGS;
 	float DistXY(Vector3 first, Vector3 second);
-protected:
 
-	//Physics
+
+	UNITS units;
+	STATE state;
+
+	//Parameters
 	std::vector<GameObject *> m_goList;
-	float m_speed;
-	float m_worldWidth;
 	float m_worldHeight;
+	float m_worldWidth;
 
-	float enemySpawnTimer;
-	float asteroidZ;
+	GameObject* magician;
+	float magicianRechargeTimer;
 
-	// Player stuff
-	GameObject *m_ship;
-	Vector3 m_force;
-	int m_objectCount;
-	int m_lives;
-	int m_score;
-	int playerHP;
-	float rotateShip = 0.f;
-	Mtx44 shipRotation;
+	GameObject* mob;
 
-	//Bullet stuff
-	static const int fireRate = 5;
-	float firingDebounce;
-	const Vector3 bulletSize = Vector3(0.5f, 0.5f, 0.5f);
-	Mtx44 bulletRotation;
 
-	// boss stuff
-	GameObject* Boss;
-	float bossFireDebounce;
-	float bossFireRate = 5;
-	int bossHP;
-	float rotateBoss = 0.f;
-	Mtx44 bossRotation;
-	int attCount;
-	float bossCD;
-	int bossDmg;
 
 	// Main Menu stuff
 	bool mainMenuCursor;
 	std::string mainMenuOptions[2];
 	float cursorDebounce;
 
-	// mob stuff
-	GameObject* mob;
-	int mobHP;
-	bool mobDead;
 
-	// Ai asn2
-	GameObject* magician;
-	float magicianRechargeTimer;
 };
 
 #endif
