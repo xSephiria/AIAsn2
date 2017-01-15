@@ -14,6 +14,7 @@ struct GameObject
 		GO_MOB,
 		GO_MAGICIAN,
 		GO_HEALER,
+		GO_WARRIOR,
 		GO_TOTAL, //must be last
 	};
 
@@ -23,11 +24,8 @@ struct GameObject
 		STATE_DEAD,
 		STATE_BUFF,
 		STATE_ATTACK,
-		STATE_CHASE,
-		STATE_ESCAPE,
-		STATE_RECOVER,
-		STATE_RECHARGE,
 		STATE_MOVE,
+		STATE_STOP,
 		STATE_HEAL,
 		NUM_STATES
 	};
@@ -38,6 +36,7 @@ struct GameObject
 		JOB_HEALER,
 		JOB_WARRIOR,
 		JOB_ARCHER,
+		JOB_MOB,
 		JOB_NONE,
 		NUM_JOB
 	};
@@ -54,6 +53,7 @@ struct GameObject
 	Vector3 scale2;
 	bool active;
 	float mass;
+	int Dmg;
 	static Color color;
 	GameObject(Color color,GAMEOBJECT_TYPE typeValue = GO_BALL);
 	GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);

@@ -26,22 +26,31 @@ void SceneAIAsn2::Init()
 
 	magician = FetchGO();
 	magician->type = GameObject::GO_MAGICIAN;
-	//magician->active = false;
+	magician->active = false;
 	magician->pos.Set(0, 10, 0);
 	magician->vel.Set(10, 0, 0);
 	magician->scale.Set(5, 5, 5);
+	magician->Dmg = 10;
 	magician->job = GameObject::JOB_MAGICIAN;
 	magicianRechargeTimer = 0.f;
 
-	//warrior = FetchGO();
+	warrior = FetchGO();
+	warrior->type = GameObject::GO_WARRIOR;
+	warrior->pos.Set(0, 10, 0);
+	warrior->vel.Set(10, 0, 0);
+	warrior->scale.Set(5, 5, 5);
+	warrior->Dmg = 20;
+	warrior->job = GameObject::JOB_WARRIOR;
 
 	//archer = FetchGO();
 
 	healer = FetchGO();
 	healer->type = GameObject::GO_HEALER;
+	healer->active = false;
 	healer->pos.Set(0, 10, 0);
 	healer->vel.Set(5, 0, 0);
 	healer->scale.Set(5, 5, 5);
+	healer->Dmg = 0;
 	healer->job = GameObject::JOB_HEALER;
 	healerAOETimer = 0.f;
 	healerCooldown = 0.f;
@@ -51,13 +60,17 @@ void SceneAIAsn2::Init()
 	mob->pos.Set(100, 10, 0);
 	mob->vel.Set(-10, 0, 0);
 	mob->scale.Set(3, 3, 3);
-	mob->job = GameObject::JOB_HEALER;
+	mob->Dmg = 5;
+	mob->job = GameObject::JOB_MOB;
 	
 	// Main menu words
 	mainMenuOptions[0] = "Start Game";
 	mainMenuOptions[1] = "Quit";
 	mainMenuCursor = 0;
 	cursorDebounce = 0.f;
+
+	warriorAFrame = 0.f;
+	mobAFrame = 0.f;
 
 	quitGame = false;
 
@@ -69,117 +82,209 @@ void SceneAIAsn2::Update(double dt)
 		quitGame = true;
 	SceneBase::Update(dt);
 
-	std::cout << magician->HP << std::endl;
+	std::cout << warrior->HP << " " << mob->HP  << " " << warrior->currentState << " " << mob->currentState << " " << mob->vel << std::endl;
 	if (state == GAMEPLAY)
 	{
-		if (magician->active) // Magician codes here
+		if (warrior->active)
 		{
-			if (magician->currentState == GameObject::STATE_MOVE)
+			if (warrior->HP > 0)
 			{
-				if (DistXY(magician->pos, mob->pos) < 200.f && mob->active)
+				if (warrior->currentState == GameObject::STATE_MOVE)
 				{
-					if (magicianRechargeTimer <= 0.f)
-						magician->currentState = GameObject::STATE_ATTACK;
-					magician->vel.SetZero();
-					mob->vel.SetZero();
-					magician->HP = 10;
-				}
-				else
-				{
-					magician->vel.Set(10, 0, 0);
-					mob->vel.Set(-10, 0, 0);
-				}
-					
-
-			}
-			else if (magician->currentState == GameObject::STATE_ATTACK)
-			{
-				if (magicianRechargeTimer <= 0.f)
-				{
-					//GameObject* fireball = FetchGO();
-					//fireball->type = GameObject::GO_BULLET;
-					//fireball->pos = magician->pos;
-					//fireball->scale = bulletSize;
-					//fireball->vel.Set(5, 0, 0);
-					//fireball->active = true;
-					//magicianRechargeTimer = 2.f;
-					//magician->currentState = GameObject::STATE_RECHARGE;
-				}
-			}
-			else if (magician->currentState == GameObject::STATE_RECHARGE)
-			{
-				magicianRechargeTimer -= dt;
-				if (magicianRechargeTimer <= 0.f)
-				{
-					magician->currentState = GameObject::STATE_MOVE;
-				}
-			}
-		}
-
-		// Healer Codes here
-		if (healer->active)
-		{
-			GameObject* healingTarget;
-			healerAOETimer -= dt;
-			/*if (healerAOETimer <= 0.f && healer->currentState != GameObject::STATE_HEAL)
-			{
-				for (auto go : m_goList)
-				{
-					if (go->job == GameObject::JOB_NONE || go->active == false)
-						continue;
-					if (DistXY(healer->pos, go->pos) < 400.f)
+					if (DistXY(warrior->pos, mob->pos) < 50.f && mob->active)
 					{
-						if (go->HP <= 100 && go->HP >= 70)
-							go->HP = 100;
-						else
-							go->HP += 30;
+						warrior->vel.SetZero();
+						warrior->currentState = GameObject::STATE_ATTACK;
+						//mob->currentState = GameObject::STATE_ATTACK;
+					}
+					if (warrior->currentState != GameObject::STATE_ATTACK && mob->active == false)
+						warrior->vel.Set(10, 0, 0);
+				}
+				else if (warrior->currentState == GameObject::STATE_ATTACK)
+				{
+					if (DistXY(warrior->pos, mob->pos) < 50.f && mob->active)
+					{
+						warriorAFrame -= 1.f;
+						if (warriorAFrame <= 0.f)
+						{
+							mob->HP -= warrior->Dmg;
+							if (mob->HP <= 0)
+								warrior->currentState = GameObject::STATE_MOVE;
+							warriorAFrame = 100.f;
+						}
+							
 					}
 				}
-			}*/
-			if (healer->currentState == GameObject::STATE_MOVE)
+			}
+			else
 			{
-				for (auto go : m_goList)
+				warrior->currentState = GameObject::STATE_DEAD;
+				warrior->active = false;
+			}
+			
+		}
+
+		if (mob->active)
+		{
+			if (mob->HP > 0)
+			{
+				if (mob->currentState == GameObject::STATE_MOVE) // 4
 				{
-					if (go->job == GameObject::JOB_NONE || go->active == false)
-						continue;
-					if (DistXY(healer->pos, go->pos) < 200.f && go->active)
+					GameObject* temp;
+					for (auto go : m_goList)
 					{
-						healer->vel.SetZero();
-						if (go->HP < 30)
+						temp = go;
+						if (temp->job == GameObject::JOB_NONE || temp->job == GameObject::JOB_MOB || temp->active == false)
+							continue;
+						if (DistXY(temp->pos, mob->pos) < 50.f && temp->active)
 						{
-							//healer->currentState = GameObject::STATE_HEAL;
-							if (healerCooldown <= 0.f)
-							{
-								go->HP += 5;
-								healerCooldown = 5.f;
-								//healingTarget = NULL;
-							}
-							healerCooldown -= dt;
+							mob->vel.SetZero();
+							mob->currentState = GameObject::STATE_ATTACK;
 						}
 					}
-					else
+					if (mob->currentState != GameObject::STATE_ATTACK && temp->active == false)
 					{
-						healer->currentState = GameObject::STATE_MOVE;
-						healer->vel.Set(5, 0, 0);
+						mob->vel.Set(-10, 0, 0);
 					}
-					
-					
 				}
-				//healer->vel.Set(5,0,0);
-			}
-			else if (healer->currentState == GameObject::STATE_HEAL)
-			{
-				if (DistXY(healer->pos, healingTarget->pos) < 200 && healerCooldown <= 0.f)
+				else if (mob->currentState == GameObject::STATE_ATTACK) // 3 
 				{
-					healer->vel.SetZero();
-					healingTarget->HP += 5;
-					healerCooldown = 5.f;
-					healingTarget = NULL;
-					healer->currentState = GameObject::STATE_MOVE;
+					GameObject* temp;
+					for (auto go : m_goList)
+					{
+						if (go->job == GameObject::JOB_NONE || go->job == GameObject::JOB_MOB || go->active == false)
+							continue;
+						temp = go;
+						if (DistXY(mob->pos, temp->pos) < 50.f && temp->active)
+						{
+							mobAFrame -= 1.f;
+							if (mobAFrame <= 0.f)
+							{
+								temp->HP -= mob->Dmg;
+								if (temp->HP <= 0)
+									mob->currentState = GameObject::STATE_MOVE;
+								mobAFrame = 100.f;
+							}
+						}
+					}
 				}
-				healerCooldown -= dt;
 			}
+			else
+			{
+				mob->currentState = GameObject::STATE_DEAD;
+				mob->active = false;
+			}
+			
 		}
+
+		//if (magician->active) // Magician codes here
+		//{
+		//	if (magician->currentState == GameObject::STATE_MOVE)
+		//	{
+		//		if (DistXY(magician->pos, mob->pos) < 200.f && mob->active)
+		//		{
+		//			if (magicianRechargeTimer <= 0.f)
+		//				magician->currentState = GameObject::STATE_ATTACK;
+		//			magician->vel.SetZero();
+		//			mob->vel.SetZero();
+		//			magician->HP = 10;
+		//		}
+		//		else
+		//		{
+		//			magician->vel.Set(10, 0, 0);
+		//			mob->vel.Set(-10, 0, 0);
+		//		}
+		//			
+
+		//	}
+		//	else if (magician->currentState == GameObject::STATE_ATTACK)
+		//	{
+		//		if (magicianRechargeTimer <= 0.f)
+		//		{
+		//			//GameObject* fireball = FetchGO();
+		//			//fireball->type = GameObject::GO_BULLET;
+		//			//fireball->pos = magician->pos;
+		//			//fireball->scale = bulletSize;
+		//			//fireball->vel.Set(5, 0, 0);
+		//			//fireball->active = true;
+		//			//magicianRechargeTimer = 2.f;
+		//			//magician->currentState = GameObject::STATE_RECHARGE;
+		//		}
+		//	}
+		//	else if (magician->currentState == GameObject::STATE_RECHARGE)
+		//	{
+		//		magicianRechargeTimer -= dt;
+		//		if (magicianRechargeTimer <= 0.f)
+		//		{
+		//			magician->currentState = GameObject::STATE_MOVE;
+		//		}
+		//	}
+		//}
+
+		//// Healer Codes here
+		//if (healer->active)
+		//{
+		//	GameObject* healingTarget;
+		//	healerAOETimer -= dt;
+		//	/*if (healerAOETimer <= 0.f && healer->currentState != GameObject::STATE_HEAL)
+		//	{
+		//		for (auto go : m_goList)
+		//		{
+		//			if (go->job == GameObject::JOB_NONE || go->active == false)
+		//				continue;
+		//			if (DistXY(healer->pos, go->pos) < 400.f)
+		//			{
+		//				if (go->HP <= 100 && go->HP >= 70)
+		//					go->HP = 100;
+		//				else
+		//					go->HP += 30;
+		//			}
+		//		}
+		//	}*/
+		//	if (healer->currentState == GameObject::STATE_MOVE)
+		//	{
+		//		for (auto go : m_goList)
+		//		{
+		//			if (go->job == GameObject::JOB_NONE || go->active == false)
+		//				continue;
+		//			if (DistXY(healer->pos, go->pos) < 200.f && go->active)
+		//			{
+		//				healer->vel.SetZero();
+		//				if (go->HP < 30)
+		//				{
+		//					//healer->currentState = GameObject::STATE_HEAL;
+		//					if (healerCooldown <= 0.f)
+		//					{
+		//						go->HP += 5;
+		//						healerCooldown = 5.f;
+		//						//healingTarget = NULL;
+		//					}
+		//					healerCooldown -= dt;
+		//				}
+		//			}
+		//			else
+		//			{
+		//				healer->currentState = GameObject::STATE_MOVE;
+		//				healer->vel.Set(5, 0, 0);
+		//			}
+		//			
+		//			
+		//		}
+		//		//healer->vel.Set(5,0,0);
+		//	}
+		//	else if (healer->currentState == GameObject::STATE_HEAL)
+		//	{
+		//		if (DistXY(healer->pos, healingTarget->pos) < 200 && healerCooldown <= 0.f)
+		//		{
+		//			healer->vel.SetZero();
+		//			healingTarget->HP += 5;
+		//			healerCooldown = 5.f;
+		//			healingTarget = NULL;
+		//			healer->currentState = GameObject::STATE_MOVE;
+		//		}
+		//		healerCooldown -= dt;
+		//	}
+		//}
 	}
 
 	// Collision checks here

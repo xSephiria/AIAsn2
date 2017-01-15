@@ -9,7 +9,8 @@ GameObject::GameObject(Color color, GAMEOBJECT_TYPE typeValue)
 	mass(1.f),
 	currentState(STATE_MOVE),
 	job(JOB_NONE),
-	HP(100)
+	HP(100),
+	Dmg(0)
 {
 	this->color.Set(color.r, color.g, color.b);
 }
@@ -21,7 +22,8 @@ GameObject::GameObject(GAMEOBJECT_TYPE typeValue)
 	mass(1.f),
 	currentState(STATE_MOVE),
 	job(JOB_NONE),
-	HP(100)
+	HP(100),
+	Dmg(0)
 {
 }
 

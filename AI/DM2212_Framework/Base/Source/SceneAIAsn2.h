@@ -47,6 +47,9 @@ private:
 	float m_worldHeight;
 	float m_worldWidth;
 
+	float warriorAFrame;
+	float mobAFrame;
+
 	GameObject* warrior;
 
 	GameObject* archer;
