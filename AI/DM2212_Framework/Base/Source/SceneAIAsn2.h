@@ -47,12 +47,19 @@ private:
 	float m_worldHeight;
 	float m_worldWidth;
 
+	GameObject* warrior;
+
+	GameObject* archer;
+
 	GameObject* magician;
 	float magicianRechargeTimer;
 
 	GameObject* mob;
 
-
+	GameObject* healer;
+	float healerCooldown;
+	float healerAOETimer;
+	GameObject* healingTarget;
 
 	// Main Menu stuff
 	bool mainMenuCursor;
@@ -60,6 +67,7 @@ private:
 	float cursorDebounce;
 
 
+	
 };
 
 #endif

@@ -10,24 +10,10 @@ struct GameObject
 	{
 		GO_NONE = 0,
 		GO_BALL,
-		GO_IRON_BALL,
-		GO_CUBE,
-		GO_ASTEROID,
-		GO_BULLET,
-		GO_SHIP,
-		GO_BOSS,
-		GO_BOSS_BULLET,
-		GO_MISSILE,
-		GO_PLAYER,
-		GO_SCAVAGEPOINT,
-		GO_ROCKS,
-		GO_WALL,
-		GO_PILLAR,
-		GO_BLOCK,
-
 		// AI asn2
+		GO_MOB,
 		GO_MAGICIAN,
-
+		GO_HEALER,
 		GO_TOTAL, //must be last
 	};
 
@@ -42,12 +28,24 @@ struct GameObject
 		STATE_RECOVER,
 		STATE_RECHARGE,
 		STATE_MOVE,
+		STATE_HEAL,
 		NUM_STATES
 	};
 
-	float HP;
+	enum JOB_CLASS
+	{
+		JOB_MAGICIAN,
+		JOB_HEALER,
+		JOB_WARRIOR,
+		JOB_ARCHER,
+		JOB_NONE,
+		NUM_JOB
+	};
+
+	int HP;
 	GAMEOBJECT_TYPE type;
-	STATES currentState = STATE_IDLE;
+	STATES currentState;
+	JOB_CLASS job;
 	Vector3 pos;
 	Vector3 vel;
 	Vector3 scale;

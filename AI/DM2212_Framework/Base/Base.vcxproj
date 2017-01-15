@@ -13,8 +13,6 @@
   <ItemGroup>
     <ClCompile Include="Source\AI.cpp" />
     <ClCompile Include="Source\Application.cpp" />
-    <ClCompile Include="Source\Asn1.cpp" />
-    <ClCompile Include="Source\Asn2.cpp" />
     <ClCompile Include="Source\Boss.cpp" />
     <ClCompile Include="Source\Camera.cpp" />
     <ClCompile Include="Source\GameObject.cpp" />
@@ -24,21 +22,13 @@
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\MeshBuilder.cpp" />
     <ClCompile Include="Source\SceneAIAsn2.cpp" />
-    <ClCompile Include="Source\SceneAsteroid.cpp" />
     <ClCompile Include="Source\SceneBase.cpp" />
-    <ClCompile Include="Source\SceneCollision.cpp" />
-    <ClCompile Include="Source\SceneCollision2.cpp" />
-    <ClCompile Include="Source\SceneKinematics.cpp" />
-    <ClCompile Include="Source\SceneMobsNBoss.cpp" />
     <ClCompile Include="Source\shader.cpp" />
-    <ClCompile Include="Source\Survival.cpp" />
     <ClCompile Include="Source\Utility.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\AI.h" />
     <ClInclude Include="Source\Application.h" />
-    <ClInclude Include="Source\Asn1.h" />
-    <ClInclude Include="Source\Asn2.h" />
     <ClInclude Include="Source\Boss.h" />
     <ClInclude Include="Source\Camera.h" />
     <ClInclude Include="Source\GameObject.h" />
@@ -51,14 +41,8 @@
     <ClInclude Include="Source\MeshBuilder.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneAIAsn2.h" />
-    <ClInclude Include="Source\SceneAsteroid.h" />
     <ClInclude Include="Source\SceneBase.h" />
-    <ClInclude Include="Source\SceneCollision.h" />
-    <ClInclude Include="Source\SceneCollision2.h" />
-    <ClInclude Include="Source\SceneKinematics.h" />
-    <ClInclude Include="Source\SceneMobsAndBoss.h" />
     <ClInclude Include="Source\shader.hpp" />
-    <ClInclude Include="Source\Survival.h" />
     <ClInclude Include="Source\Utility.h" />
     <ClInclude Include="Source\Vertex.h" />
   </ItemGroup>

@@ -11,13 +11,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-//#include "SceneKinematics.h"
-//#include "SceneAsteroid.h"
-#include "Asn1.h"
-//#include "SceneCollision.h"
-#include "Asn2.h"
-#include "Survival.h"
-#include "SceneMobsAndBoss.h"
 #include "SceneAIAsn2.h"
 
 GLFWwindow* m_window;
