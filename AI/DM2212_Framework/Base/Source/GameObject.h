@@ -54,6 +54,8 @@ struct GameObject
 	bool active;
 	float mass;
 	int Dmg;
+	int Def;
+	bool isHealTarget;
 	static Color color;
 	GameObject(Color color,GAMEOBJECT_TYPE typeValue = GO_BALL);
 	GameObject(GAMEOBJECT_TYPE typeValue = GO_BALL);

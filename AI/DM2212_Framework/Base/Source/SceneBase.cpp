@@ -138,6 +138,11 @@ void SceneBase::Init()
 	meshList[GEO_ROCKS] = MeshBuilder::GenerateQuad("Rocks", Color(1, 1, 1), 1);
 	meshList[GEO_ROCKS]->textureID = LoadTGA("Image//Rocks.tga");
 
+	meshList[GEO_WARRIOR] = MeshBuilder::GenerateQuad("Warrior", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR]->textureID = LoadTGA("Image//warrior.tga");
+	meshList[GEO_HEALER] = MeshBuilder::GenerateQuad("Healer", Color(1, 1, 1), 1);
+	meshList[GEO_HEALER]->textureID = LoadTGA("Image//healer.tga");
+
 	bLightEnabled = false;
 }
 

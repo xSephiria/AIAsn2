@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include <vector>
 #include "SceneBase.h"
+#include <sstream>
 
 enum UNITS{
 	WARRIOR,
@@ -30,14 +31,14 @@ public:
 
 private:
 	void Init();
-	void Update(double dt);		
+	void Update(double dt);
 	void RenderGO(GameObject *go);
 	void Render();
 	void Exit();
 	GameObject* FetchGO();
 
 	float DistXY(Vector3 first, Vector3 second);
-
+	int RNG(int y);
 
 	UNITS units;
 	STATE state;
@@ -51,26 +52,29 @@ private:
 	float mobAFrame;
 
 	GameObject* warrior;
+	int WarriorGuard;
 
 	GameObject* archer;
 
 	GameObject* magician;
 	float magicianRechargeTimer;
 
-	GameObject* mob;
+
+	float mobSpawnTimer;
 
 	GameObject* healer;
 	float healerCooldown;
 	float healerAOETimer;
-	GameObject* healingTarget;
+
 
 	// Main Menu stuff
 	bool mainMenuCursor;
 	std::string mainMenuOptions[2];
 	float cursorDebounce;
 
+	int mobcount;
+	float FPS;
 
-	
 };
 
 #endif

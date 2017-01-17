@@ -10,7 +10,9 @@ GameObject::GameObject(Color color, GAMEOBJECT_TYPE typeValue)
 	currentState(STATE_MOVE),
 	job(JOB_NONE),
 	HP(100),
-	Dmg(0)
+	Dmg(0),
+	Def(0),
+	isHealTarget(false)
 {
 	this->color.Set(color.r, color.g, color.b);
 }
@@ -23,7 +25,9 @@ GameObject::GameObject(GAMEOBJECT_TYPE typeValue)
 	currentState(STATE_MOVE),
 	job(JOB_NONE),
 	HP(100),
-	Dmg(0)
+	Dmg(0),
+	Def(0),
+	isHealTarget(false)
 {
 }
 
