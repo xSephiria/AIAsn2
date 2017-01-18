@@ -49,12 +49,15 @@ private:
 	float m_worldWidth;
 
 	float warriorAFrame;
+	float archerAFrame;
+
 	float mobAFrame;
 
 	GameObject* warrior;
 	int WarriorGuard;
 
 	GameObject* archer;
+
 
 	GameObject* magician;
 	float magicianRechargeTimer;

@@ -45,9 +45,16 @@ void SceneAIAsn2::Init()
 	warrior->HP = 150;
 	warrior->job = GameObject::JOB_WARRIOR;*/
 
-	//archer = FetchGO();
+	archer = FetchGO();
+	archer->type = GameObject::GO_ARCHER;
+	archer->active = true;
+	archer->pos.Set(0, 10, 0);
+	archer->vel.Set(10, 0, 0);
+	archer->scale.Set(5, 5, 5);
+	archer->Dmg = 10;
+	archer->job = GameObject::JOB_ARCHER;
 
-	healer = FetchGO();
+	/*healer = FetchGO();
 	healer->type = GameObject::GO_HEALER;
 	healer->pos.Set(0, 10, 0);
 	healer->vel.Set(5, 0, 0);
@@ -55,13 +62,12 @@ void SceneAIAsn2::Init()
 	healer->Dmg = 0;
 	healer->job = GameObject::JOB_HEALER;
 	healerAOETimer = 14.f;
-	healerCooldown = 0.f;
+	healerCooldown = 0.f;*/
 
 	for (int i = 0; i < 10; i++)
 	{
 		m_goList.push_back(new GameObject(GameObject::GO_MOB));
 	}
-
 	
 	// Main menu words
 	mainMenuOptions[0] = "Start Game";
@@ -70,6 +76,7 @@ void SceneAIAsn2::Init()
 	cursorDebounce = 0.f;
 
 	warriorAFrame = 0.f;
+	archerAFrame = 0.f;
 	mobAFrame = 0.f;
 	WarriorGuard = -1;
 
@@ -88,11 +95,11 @@ void SceneAIAsn2::Update(double dt)
 	SceneBase::Update(dt);
 	FPS = 1 / dt;
 	//std::cout << warrior->HP << " " << mob->HP  << " " <<  mob->currentState << " " << warrior->Def << std::endl;
-	std::cout << healer->currentState << healer->vel << std::endl;
+	//std::cout << healer->currentState << healer->vel << std::endl;
 	if (state == GAMEPLAY)
 	{
 		mobSpawnTimer -= dt;
-		if (mobSpawnTimer <= 0.f && mobcount < 6)
+		if (mobSpawnTimer <= 0.f && mobcount < 1)
 		{
 			GameObject* mob = new GameObject(GameObject::GO_MOB);
 			mob->type = GameObject::GO_MOB;
@@ -185,13 +192,73 @@ void SceneAIAsn2::Update(double dt)
 
 		//}
 
-		/*if (archer->active)
+		if (archer->active)
 		{
 			if (archer->HP > 0)
 			{
-
+				if (archer->HP < 70)
+				{
+					archer->isHealTarget = true;
+				}
+				if (archer->currentState == GameObject::STATE_MOVE)
+				{
+					for (auto mob : m_goList)
+					{
+						if (mob->job == GameObject::JOB_MOB)
+						{
+							if (DistXY(archer->pos, mob->pos) < 1000.f && mob->active)
+							{
+								archer->vel.SetZero();
+								archer->currentState = GameObject::STATE_ATTACK;
+							}
+							if (archer->currentState != GameObject::STATE_ATTACK && mob->active == false)
+								archer->vel.Set(10, 0, 0);
+						}
+					}
+				}
+				else if (archer->currentState == GameObject::STATE_ATTACK)
+				{
+					for (auto mob : m_goList)
+					{
+						
+						if (mob->job == GameObject::JOB_MOB)
+						{
+							archerAFrame -= 1.f;
+							if (archerAFrame <= 0.f)
+							{
+								GameObject* arrow = FetchGO();
+								arrow->type = GameObject::GO_ARROW;
+								arrow->pos.Set(archer->pos.x, archer->pos.y, 0);
+								arrow->vel.Set(30, 0, 0);
+								arrow->scale.Set(3, 3, 3);
+								arrow->Dmg = 15;
+								std::cout << "shoot" << std::endl;
+								std::cout << arrow->pos << "" << mob->pos << std::endl;
+								std::cout << (DistXY(arrow->pos, mob->pos)) << std::endl;
+								if (DistXY(arrow->pos, mob->pos) < 50.f && mob->active)
+								{
+									mob->HP -= 50;
+									arrow->active = false;
+									if (mob->HP <= 0)
+										archer->currentState = GameObject::STATE_MOVE;
+								}
+								archerAFrame = 100.f;
+							}
+						}
+					}
+				}
+				else
+				{
+					archer->currentState == GameObject::STATE_DEAD;
+					archer->active = false;
+					for (auto go : m_goList)
+					{
+						if (go->active == false)
+							go = NULL;
+					}
+				}
 			}
-		}*/
+		}
 
 		for (auto PerMob : m_goList)
 		{
@@ -313,105 +380,105 @@ void SceneAIAsn2::Update(double dt)
 		//}
 
 		//// Healer Codes here
-		if (healer->active)
-		{
-			if (healer->HP > 0)
-			{
-				healerCooldown -= dt;
-				healerAOETimer -= dt;
-				if (healerAOETimer <= 0.f && healer->currentState != GameObject::STATE_HEAL)
-				{
-					for (auto go : m_goList)
-					{
-						if (go->job == GameObject::JOB_NONE || go->active == false)
-							continue;
-						if (DistXY(healer->pos, go->pos) < 400.f)
-						{
-							/*if (go->job == GameObject::JOB_MOB)
-							{
-								healer->currentState = GameObject::STATE_MOVE;
-								healer->vel.SetZero();
-							}*/
-							if (go->job == GameObject::JOB_WARRIOR)
-							{
-								if (go->HP <= 150 && go->HP >= 90)
-									go->HP = 150;
-								else
-									go->HP += 60;
-							}
-							else
-							{
-								if (go->HP <= 100 && go->HP >= 50)
-									go->HP = 100;
-								else
-									go->HP += 50;
-							}
-						}
-					}
-					healerAOETimer = 15.f;
-				}
-				if (healer->currentState == GameObject::STATE_MOVE)
-				{
-					for (auto go : m_goList)
-					{
-						if (go->job == GameObject::JOB_NONE || go->job == GameObject::JOB_HEALER || go->active == false)
-							continue;
-						if (go->job == GameObject::JOB_MOB)
-						{
-							if (DistXY(healer->pos, go->pos) < 200.f && go->active)
-							{
-								healer->vel.SetZero();
-							}
-							else if (go->active == false)
-							{
-								healer->vel.Set(5, 0, 0);
-							}
-						}
-						else
-						{
-							if (DistXY(healer->pos, go->pos) < 200.f && go->active)
-							{
-								healer->vel.SetZero();
-								if (go->isHealTarget == true)
-								{
-									healer->currentState = GameObject::STATE_HEAL;
-									//go->isHealTarget = true;
-								}
-							}
-							else
-							{
-								healer->vel.Set(5, 0, 0);
-							}
-						}
+		//if (healer->active)
+		//{
+		//	if (healer->HP > 0)
+		//	{
+		//		healerCooldown -= dt;
+		//		healerAOETimer -= dt;
+		//		if (healerAOETimer <= 0.f && healer->currentState != GameObject::STATE_HEAL)
+		//		{
+		//			for (auto go : m_goList)
+		//			{
+		//				if (go->job == GameObject::JOB_NONE || go->active == false)
+		//					continue;
+		//				if (DistXY(healer->pos, go->pos) < 400.f)
+		//				{
+		//					/*if (go->job == GameObject::JOB_MOB)
+		//					{
+		//						healer->currentState = GameObject::STATE_MOVE;
+		//						healer->vel.SetZero();
+		//					}*/
+		//					if (go->job == GameObject::JOB_WARRIOR)
+		//					{
+		//						if (go->HP <= 150 && go->HP >= 90)
+		//							go->HP = 150;
+		//						else
+		//							go->HP += 60;
+		//					}
+		//					else
+		//					{
+		//						if (go->HP <= 100 && go->HP >= 50)
+		//							go->HP = 100;
+		//						else
+		//							go->HP += 50;
+		//					}
+		//				}
+		//			}
+		//			healerAOETimer = 15.f;
+		//		}
+		//		if (healer->currentState == GameObject::STATE_MOVE)
+		//		{
+		//			for (auto go : m_goList)
+		//			{
+		//				if (go->job == GameObject::JOB_NONE || go->job == GameObject::JOB_HEALER || go->active == false)
+		//					continue;
+		//				if (go->job == GameObject::JOB_MOB)
+		//				{
+		//					if (DistXY(healer->pos, go->pos) < 200.f && go->active)
+		//					{
+		//						healer->vel.SetZero();
+		//					}
+		//					else if (go->active == false)
+		//					{
+		//						healer->vel.Set(5, 0, 0);
+		//					}
+		//				}
+		//				else
+		//				{
+		//					if (DistXY(healer->pos, go->pos) < 200.f && go->active)
+		//					{
+		//						healer->vel.SetZero();
+		//						if (go->isHealTarget == true)
+		//						{
+		//							healer->currentState = GameObject::STATE_HEAL;
+		//							//go->isHealTarget = true;
+		//						}
+		//					}
+		//					else
+		//					{
+		//						healer->vel.Set(5, 0, 0);
+		//					}
+		//				}
 
-					}
+		//			}
 
-				}
-				else if (healer->currentState == GameObject::STATE_HEAL)
-				{
-					for (auto go : m_goList)
-					{
-						if (go->isHealTarget)
-						{
-							if (healerCooldown <= 0.f && (DistXY(healer->pos, go->pos) < 200.f))
-							{
-								healer->vel.SetZero();
-								go->HP += 10;
-								healerCooldown = 2.f;
-								go->isHealTarget = false;
-								healer->currentState = GameObject::STATE_MOVE;
-								break;
-							}
-						}
-					}
-				}
-			}
-			else
-			{
-				healer->currentState == GameObject::STATE_DEAD;
-				healer->active = false;
-			}
-		}
+		//		}
+		//		else if (healer->currentState == GameObject::STATE_HEAL)
+		//		{
+		//			for (auto go : m_goList)
+		//			{
+		//				if (go->isHealTarget)
+		//				{
+		//					if (healerCooldown <= 0.f && (DistXY(healer->pos, go->pos) < 200.f))
+		//					{
+		//						healer->vel.SetZero();
+		//						go->HP += 10;
+		//						healerCooldown = 2.f;
+		//						go->isHealTarget = false;
+		//						healer->currentState = GameObject::STATE_MOVE;
+		//						break;
+		//					}
+		//				}
+		//			}
+		//		}
+		//	}
+		//	else
+		//	{
+		//		healer->currentState == GameObject::STATE_DEAD;
+		//		healer->active = false;
+		//	}
+		//}
 	}
 
 	// Collision checks here
@@ -446,7 +513,6 @@ GameObject* SceneAIAsn2::FetchGO()
 	{
 		m_goList.push_back(new GameObject(GameObject::GO_MOB));
 	}
-
 	GameObject* go = *(m_goList.end() - 1);
 	go->active = true;
 	return go;
@@ -547,6 +613,22 @@ void SceneAIAsn2::RenderGO(GameObject *go)
 		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
 		//modelStack.Rotate(rotateShip, 0, 0, 1);
 		RenderMesh(meshList[GEO_WARRIOR], false);
+		modelStack.PopMatrix();
+		break;
+	case GameObject::GO_ARCHER:
+		modelStack.PushMatrix();
+		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
+		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
+		//modelStack.Rotate(rotateShip, 0, 0, 1);
+		RenderMesh(meshList[GEO_WARRIOR], false);
+		modelStack.PopMatrix();
+		break;
+	case GameObject::GO_ARROW:
+		modelStack.PushMatrix();
+		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
+		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
+		//modelStack.Rotate(rotateShip, 0, 0, 1);
+		RenderMesh(meshList[GEO_SHIP], false);
 		modelStack.PopMatrix();
 		break;
 	default:

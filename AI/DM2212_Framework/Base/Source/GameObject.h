@@ -15,6 +15,8 @@ struct GameObject
 		GO_MAGICIAN,
 		GO_HEALER,
 		GO_WARRIOR,
+		GO_ARCHER,
+		GO_ARROW,
 		GO_TOTAL, //must be last
 	};
 
