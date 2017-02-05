@@ -29,9 +29,9 @@ void SceneAIAsn2::Init()
 	/*magician = FetchGO();
 	magician->type = GameObject::GO_MAGICIAN;
 	magician->active = true;
-	magician->pos.Set(0, 5, -1);
+	magician->pos.Set(0, 12, -1);
 	magician->vel.Set(10, 0, 0);
-	magician->scale.Set(5, 5, 5);
+	magician->scale.Set(10, 10, 5);
 	magician->Dmg = 10;
 	magician->job = GameObject::JOB_MAGICIAN;
 	magicianRechargeTimer = 0.f;*/
@@ -47,8 +47,8 @@ void SceneAIAsn2::Init()
 	HeroTower = FetchGO();
 	HeroTower->type = GameObject::GO_HEROTOWER;
 	HeroTower->active = true;
-	HeroTower->pos.Set(12, 21, -1);
-	HeroTower->scale.Set(25, 40, 10);
+	HeroTower->pos.Set(12, 32, -1);
+	HeroTower->scale.Set(35, 50, 10);
 	HeroTower->vel.Set(0, 0, 0);
 	HeroTower->HP = 1000;
 	HeroTower->job = GameObject::JOB_HTOWER;
@@ -56,17 +56,17 @@ void SceneAIAsn2::Init()
 	EnemyTower = FetchGO();
 	EnemyTower->type = GameObject::GO_ENEMYTOWER;
 	EnemyTower->active = true;
-	EnemyTower->pos.Set(165, 21, 0);
-	EnemyTower->scale.Set(25, 40, 10);
+	EnemyTower->pos.Set(165, 32, 0);
+	EnemyTower->scale.Set(35, 50, 10);
 	EnemyTower->vel.Set(0, 0, 0);
 	EnemyTower->HP = 2000;
 	EnemyTower->job = GameObject::JOB_ETOWER;
 
 	warrior = FetchGO();
 	warrior->type = GameObject::GO_WARRIOR;
-	warrior->pos.Set(0, 5, 0);
+	warrior->pos.Set(0, 12, 0);
 	warrior->vel.Set(10, 0, 0);
-	warrior->scale.Set(5, 5, 1);
+	warrior->scale.Set(10, 10, 1);
 	warrior->Dmg = 10;
 	warrior->HP = 150;
 	warrior->job = GameObject::JOB_WARRIOR;
@@ -74,17 +74,17 @@ void SceneAIAsn2::Init()
 	/*archer = FetchGO();
 	archer->type = GameObject::GO_ARCHER;
 	archer->active = true;
-	archer->pos.Set(HeroTower->pos.x, 5, 0);
+	archer->pos.Set(HeroTower->pos.x, 12, 0);
 	archer->vel.Set(10, 0, 0);
-	archer->scale.Set(5, 5, 5);
+	archer->scale.Set(10, 10, 5);
 	archer->Dmg = 10;
 	archer->job = GameObject::JOB_ARCHER;
 
 	healer = FetchGO();
 	healer->type = GameObject::GO_HEALER;
-	healer->pos.Set(HeroTower->pos.x, 5, 0);
+	healer->pos.Set(HeroTower->pos.x, 12, 0);
 	healer->vel.Set(8, 0, 0);
-	healer->scale.Set(5, 5, 5);
+	healer->scale.Set(10, 10, 5);
 	healer->Dmg = 0;
 	healer->job = GameObject::JOB_HEALER;
 	healerAOETimer = 14.f;
@@ -154,7 +154,7 @@ void SceneAIAsn2::Update(double dt)
 		{
 			mob = new GameObject(GameObject::GO_MOB);
 			mob->type = GameObject::GO_MOB;
-			mob->pos.Set(EnemyTower->pos.x, 5, 0);
+			mob->pos.Set(EnemyTower->pos.x, 10, 0);
 			mob->vel.Set(-10, 0, 0);
 			mob->scale.Set(3, 3, 3);
 			mob->Dmg = 5;
