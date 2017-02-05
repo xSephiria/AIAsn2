@@ -80,6 +80,9 @@ void SceneAIAsn2::Init()
 	mobAFrame = 0.f;
 	WarriorGuard = -1;
 
+	ArcherAnimCounter = 0;
+	ArcherShoot = false;
+	arrowcount = 0;
 
 	mobSpawnTimer = 5.f;
 	FPS = 0;
@@ -94,24 +97,16 @@ void SceneAIAsn2::Update(double dt)
 		quitGame = true;
 	SceneBase::Update(dt);
 	FPS = 1 / dt;
-	//std::cout << warrior->HP << " " << mob->HP  << " " <<  mob->currentState << " " << warrior->Def << std::endl;
-	//std::cout << healer->currentState << healer->vel << std::endl;
+
+	ArcherAnimation(dt);
+	//std::cout << archer->currentState << std::endl;
+
 	if (state == GAMEPLAY)
 	{
 		mobSpawnTimer -= dt;
-		if (mobSpawnTimer <= 0.f && mobcount < 1)
+		if (mobSpawnTimer <= 0.f && mobcount < 2)
 		{
-			GameObject* mob = new GameObject(GameObject::GO_MOB);
-			mob->type = GameObject::GO_MOB;
-			mob->pos.Set(100, 10, 0);
-			mob->vel.Set(-10, 0, 0);
-			mob->scale.Set(3, 3, 3);
-			mob->Dmg = 5;
-			mob->job = GameObject::JOB_MOB;
-			mob->active = true;
-			mobSpawnTimer = 5.f;
-			mobcount++;
-			m_goList.push_back(mob);
+			CreateMob();
 		}
 
 		//if (warrior->active)
@@ -220,30 +215,33 @@ void SceneAIAsn2::Update(double dt)
 				{
 					for (auto mob : m_goList)
 					{
-						
+
 						if (mob->job == GameObject::JOB_MOB)
 						{
-							archerAFrame -= 1.f;
-							if (archerAFrame <= 0.f)
+							//archerAFrame -= 1.f;
+							if (ArcherShoot == true)
 							{
-								GameObject* arrow = FetchGO();
-								arrow->type = GameObject::GO_ARROW;
-								arrow->pos.Set(archer->pos.x, archer->pos.y, 0);
-								arrow->vel.Set(30, 0, 0);
-								arrow->scale.Set(3, 3, 3);
-								arrow->Dmg = 15;
-								std::cout << "shoot" << std::endl;
-								std::cout << arrow->pos << "" << mob->pos << std::endl;
-								std::cout << (DistXY(arrow->pos, mob->pos)) << std::endl;
-								if (DistXY(arrow->pos, mob->pos) < 50.f && mob->active)
-								{
-									mob->HP -= 50;
-									arrow->active = false;
-									if (mob->HP <= 0)
-										archer->currentState = GameObject::STATE_MOVE;
-								}
-								archerAFrame = 100.f;
+								CreateArrow();
+								ArcherShoot = false;
 							}
+							for (auto arrowList : m_goList)
+							{
+								if (arrowList->type == GameObject::GO_ARROW)
+								{
+									if (arrowList->active)
+									{
+										if (DistXY(arrowList->pos, mob->pos) < 50.f)
+										{
+											arrowList->active = false;
+											mob->HP -= 10;
+											if (mob->HP <= 0)
+												archer->currentState = GameObject::STATE_MOVE;
+										}
+									}
+								}
+								
+							}
+							
 						}
 					}
 				}
@@ -266,6 +264,8 @@ void SceneAIAsn2::Update(double dt)
 			{
 				if (PerMob->active)
 				{
+					std::cout << PerMob->currentState << std::endl;
+
 					if (PerMob->HP > 0)
 					{
 						if (PerMob->currentState == GameObject::STATE_MOVE) // 4
@@ -275,7 +275,7 @@ void SceneAIAsn2::Update(double dt)
 							{
 								if (go->job == GameObject::JOB_NONE || go->job == GameObject::JOB_MOB/* || go->active == false*/)
 									continue;
-								if (DistXY(go->pos, PerMob->pos) <= 50.f && go->active == true)
+								if (DistXY(go->pos, PerMob->pos) <= 200.f && go->active == true)
 								{
 									PerMob->vel.SetZero();
 									PerMob->currentState = GameObject::STATE_ATTACK;
@@ -326,6 +326,7 @@ void SceneAIAsn2::Update(double dt)
 					{
 						PerMob->currentState = GameObject::STATE_DEAD;
 						PerMob->active = false;
+						//m_goList.
 						mobcount--;
 					}
 
@@ -490,9 +491,19 @@ void SceneAIAsn2::Update(double dt)
 			if (go->type == GameObject::GO_MOB)
 			{
 				if (go->pos.x > m_worldWidth)
+				{
 					go->currentState = GameObject::STATE_DEAD;
+					go->active = false;
+					delete go;
+				}
+					
 				if (go->pos.x < 0)
+				{
 					go->currentState = GameObject::STATE_DEAD;
+					go->active = false;
+					delete go;
+				}
+					
 			}
 		}
 	}
@@ -619,8 +630,26 @@ void SceneAIAsn2::RenderGO(GameObject *go)
 		modelStack.PushMatrix();
 		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
 		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
-		//modelStack.Rotate(rotateShip, 0, 0, 1);
-		RenderMesh(meshList[GEO_WARRIOR], false);
+		if (archer->currentState == GameObject::STATE_MOVE)
+		{
+			if (ArcherAnimCounter >= 0.f && ArcherAnimCounter < 1.f)
+				RenderMesh(meshList[GEO_ARCHER_WALK_FRAME0], false);
+			else if (ArcherAnimCounter >= 1.f && ArcherAnimCounter < 2.f)
+				RenderMesh(meshList[GEO_ARCHER_WALK_FRAME1], false);
+			else if (ArcherAnimCounter >= 2.f && ArcherAnimCounter < 3.f)
+				RenderMesh(meshList[GEO_ARCHER_WALK_FRAME2], false);
+			else if (ArcherAnimCounter >= 3.f)
+				RenderMesh(meshList[GEO_ARCHER_WALK_FRAME3], false);
+		}
+		else if (archer->currentState == GameObject::STATE_ATTACK)
+		{
+			if (ArcherAnimCounter >= 0.f && ArcherAnimCounter < 1.f)
+				RenderMesh(meshList[GEO_ARCHER_SHOOT_FRAME0], false);
+			else if (ArcherAnimCounter >= 1.f && ArcherAnimCounter < 2.f)
+				RenderMesh(meshList[GEO_ARCHER_SHOOT_FRAME1], false);
+			else if (ArcherAnimCounter >= 2.f && ArcherAnimCounter < 3.f)
+				RenderMesh(meshList[GEO_ARCHER_SHOOT_FRAME2], false);
+		}
 		modelStack.PopMatrix();
 		break;
 	case GameObject::GO_ARROW:
@@ -668,5 +697,53 @@ int SceneAIAsn2::RNG(int y)
 {
 	srand(time(NULL));
 	return rand()%y;
+
+}
+
+void SceneAIAsn2::ArcherAnimation(double dt)
+{
+	if (archer->currentState == GameObject::STATE_MOVE)
+	{
+		ArcherAnimCounter += 0.1f;
+		if (ArcherAnimCounter > 4)
+			ArcherAnimCounter = 0;
+	}
+	else if (archer->currentState == GameObject::STATE_ATTACK)
+	{
+		ArcherAnimCounter += 0.1f;
+		if (ArcherAnimCounter > 3)
+		{
+			if (ArcherAnimCounter >= 2.f)
+				ArcherShoot = true;
+			ArcherAnimCounter = 0;
+		}
+	}
+	
+}
+
+void SceneAIAsn2::CreateArrow()
+{
+	arrow = FetchGO();
+	arrow->type = GameObject::GO_ARROW;
+	arrow->pos.Set(archer->pos.x, archer->pos.y, 0);
+	arrow->vel.Set(30, 0, 0);
+	arrow->scale.Set(3, 3, 3);
+	arrow->Dmg = 15;
+}
+
+void SceneAIAsn2::CreateMob()
+{
+	mob = new GameObject(GameObject::GO_MOB);
+	mob = FetchGO();
+	mob->type = GameObject::GO_MOB;
+	mob->pos.Set(100, 10, 0);
+	mob->vel.Set(-10, 0, 0);
+	mob->scale.Set(3, 3, 3);
+	mob->Dmg = 5;
+	mob->job = GameObject::JOB_MOB;
+	mob->active = true;
+	mobSpawnTimer = 5.f;
+	mobcount++;
+	m_goList.push_back(mob);
 
 }

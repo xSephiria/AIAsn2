@@ -57,13 +57,15 @@ private:
 	int WarriorGuard;
 
 	GameObject* archer;
-
+	GameObject* arrow;
+	void CreateArrow();
 
 	GameObject* magician;
 	float magicianRechargeTimer;
 
-
+	GameObject* mob;
 	float mobSpawnTimer;
+	void CreateMob();
 
 	GameObject* healer;
 	float healerCooldown;
@@ -76,7 +78,15 @@ private:
 	float cursorDebounce;
 
 	int mobcount;
+	int arrowcount;
 	float FPS;
+
+	void ArcherAnimation(double dt);
+	void WarriorAnimation(double dt);
+	float ArcherAnimCounter;
+	float WarriorAnimCounter;
+
+	bool ArcherShoot;
 
 };
 

@@ -7,6 +7,8 @@
 class Mesh
 {
 public:
+	static const int MAX_TEXTURES = 2;
+ 
 	enum DRAW_MODE
 	{
 		DRAW_TRIANGLES, //default mode
@@ -27,6 +29,7 @@ public:
 
 	Material material;
 	unsigned textureID;
+	unsigned textureArray[MAX_TEXTURES];
 };
 
 #endif

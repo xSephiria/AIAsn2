@@ -10,14 +10,23 @@ Mesh::Mesh(const std::string &meshName)
 	glGenBuffers(1, &vertexBuffer);
 	glGenBuffers(1, &indexBuffer);
 	textureID = 0;
+
+	for (int i = 0; i < MAX_TEXTURES; ++i)
+	{
+		textureArray[i] = 0;
+	}
 }
 
 Mesh::~Mesh()
 {
 	glDeleteBuffers(1, &vertexBuffer);
 	glDeleteBuffers(1, &indexBuffer);
-	if(textureID > 0)
-		glDeleteTextures(1, &textureID);
+	//if(textureID > 0)
+	//	glDeleteTextures(1, &textureID);
+	for (int i = 0; i < MAX_TEXTURES; ++i)
+	{
+		glDeleteTextures(1, &textureArray[i]);
+	}
 }
 
 void Mesh::Render()
@@ -30,7 +39,7 @@ void Mesh::Render()
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)0);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)sizeof(Position));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Position) + sizeof(Color)));
-	if(textureID > 0)
+	//if(textureID > 0)
 	{
 		glEnableVertexAttribArray(3);
 		glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)(sizeof(Position) + sizeof(Color) + sizeof(Vector3)));
@@ -51,7 +60,7 @@ void Mesh::Render()
 	glDisableVertexAttribArray(1);
 	glDisableVertexAttribArray(2);
 
-	if(textureID > 0)
+	//if(textureID > 0)
 	{
 		glDisableVertexAttribArray(3);
 	}
