@@ -98,9 +98,12 @@ private:
 	float ArcherAnimCounter;
 	float WarriorAnimCounter;
 	float HealerAnimCounter;
+	float MagicianAnimCounter;
 
 	bool ArcherShoot;
 	bool HealerHeal;
+	bool WarriorAttack;
+	bool MagicianAttack;
 
 };
 

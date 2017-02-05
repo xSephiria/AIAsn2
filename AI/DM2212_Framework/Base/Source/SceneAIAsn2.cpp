@@ -108,8 +108,12 @@ void SceneAIAsn2::Init()
 
 	ArcherAnimCounter = 0;
 	HealerAnimCounter = 0;
+	WarriorAnimCounter = 0;
+	MagicianAnimCounter = 0;
 	ArcherShoot = false;
 	HealerHeal = false;
+	WarriorAttack = false;
+	MagicianAttack = false;
 	arrowcount = 0;
 
 	mobSpawnTimer = 5.f;
@@ -129,7 +133,8 @@ void SceneAIAsn2::Update(double dt)
 
 	//ArcherAnimation();
 	//HealerAnimation();
-	std::cout << HealerAnimCounter <<  " " << FPS << std::endl;
+	WarriorAnimation();
+	std::cout << warrior->currentState << " " << WarriorAnimCounter << std::endl;
 
 	for (std::vector<GameObject *> ::iterator it = m_goList.begin(); it != m_goList.end(); )
 	{
@@ -149,7 +154,7 @@ void SceneAIAsn2::Update(double dt)
 
 	if (state == GAMEPLAY)
 	{
-		mobSpawnTimer -= dt;
+		/*mobSpawnTimer -= dt;
 		if (mobSpawnTimer <= 0.f && mobcount < 1)
 		{
 			mob = new GameObject(GameObject::GO_MOB);
@@ -164,7 +169,7 @@ void SceneAIAsn2::Update(double dt)
 			mobSpawnTimer = 5.f;
 			mobcount++;
 			m_goList.push_back(mob);
-		}
+		}*/
 
 		if (ArcherShoot)
 		{
@@ -203,7 +208,7 @@ void SceneAIAsn2::Update(double dt)
 										warrior->currentState = GameObject::STATE_ATTACK;
 										break;
 									}
-									if (mob->job == GameObject::JOB_ETOWER && DistXY(warrior->pos, mob->pos) < 1000.f && mob->active)
+									if (mob->job == GameObject::JOB_ETOWER && DistXY(warrior->pos, mob->pos) < 150.f && mob->active)
 									{
 										warrior->vel.SetZero();
 										warrior->currentState = GameObject::STATE_ATTACK;
@@ -220,31 +225,46 @@ void SceneAIAsn2::Update(double dt)
 				}
 				else if (warrior->currentState == GameObject::STATE_ATTACK)
 				{
+					bool EnemyAlive = false;
 					for (auto mob : m_goList)
 					{
-						if (mob->job == GameObject::JOB_MOB)
+						if (mob->job == GameObject::JOB_MOB || mob->job == GameObject::JOB_ETOWER)
 						{
-							if (DistXY(warrior->pos, mob->pos) <= 50.f && mob->active)
+							if (mob->job == GameObject::JOB_MOB && DistXY(warrior->pos, mob->pos) <= 50.f && mob->active)
 							{
-								warriorAFrame -= 1.f;
-								if (warriorAFrame <= 0.f)
+								EnemyAlive = true;
+								WarriorGuard = Math::RandIntMinMax(0, 3);
+								if (WarriorAttack)
 								{
-									WarriorGuard = Math::RandIntMinMax(0, 3);
 									warrior->Def = 0;
 									if (WarriorGuard == 0)
 									{
 										warrior->Def = 3;
+										WarriorAttack = false;
+										break;
 									}
-									else if (WarriorGuard > 0)
+									else if (WarriorGuard > 0 )
 									{
 										mob->HP -= warrior->Dmg;
-										if (mob->HP <= 0)
-											warrior->currentState = GameObject::STATE_MOVE;
+										WarriorAttack = false;
+										break;
 									}
-									warriorAFrame = 50.f;
 								}
 							}
+							if (mob->job == GameObject::JOB_ETOWER && DistXY(warrior->pos, mob->pos) <= 200.f && mob->active)
+							{
+								EnemyAlive = true;
+								if (WarriorAttack)
+									mob->HP -= warrior->Dmg;
+								WarriorAttack = false;
+								break;
+							}
 						}
+						
+					}
+					if (!EnemyAlive)
+					{
+						warrior->currentState = GameObject::STATE_MOVE;
 					}
 				}
 			}
@@ -799,9 +819,30 @@ void SceneAIAsn2::RenderGO(GameObject *go)
 	case GameObject::GO_WARRIOR:
 		modelStack.PushMatrix();
 		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
-		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
-		//modelStack.Rotate(rotateShip, 0, 0, 1);
-		RenderMesh(meshList[GEO_WARRIOR], false);
+		if (warrior->currentState == GameObject::STATE_MOVE)
+			modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
+		else if (warrior->currentState == GameObject::STATE_ATTACK)
+			modelStack.Scale(go->scale.x, go->scale.y + (4), go->scale.z);
+		if (warrior->currentState == GameObject::STATE_MOVE)
+		{
+			if (WarriorAnimCounter >= 0.f && WarriorAnimCounter < 1.f)
+				RenderMesh(meshList[GEO_WARRIOR_WALK_FRAME0], false);
+			else if (WarriorAnimCounter >= 1.f && WarriorAnimCounter < 2.f)
+				RenderMesh(meshList[GEO_WARRIOR_WALK_FRAME1], false);
+			else if (WarriorAnimCounter >= 2.f && WarriorAnimCounter < 3.f)
+				RenderMesh(meshList[GEO_WARRIOR_WALK_FRAME2], false);
+			else if (WarriorAnimCounter >= 3.f)
+				RenderMesh(meshList[GEO_WARRIOR_WALK_FRAME3], false);
+		}
+		else if (warrior->currentState == GameObject::STATE_ATTACK)
+		{
+			if (WarriorAnimCounter >= 0.f && WarriorAnimCounter < 1.f)
+				RenderMesh(meshList[GEO_WARRIOR_SHOOT_FRAME0], false);
+			else if (WarriorAnimCounter >= 1.f && WarriorAnimCounter < 2.f)
+				RenderMesh(meshList[GEO_WARRIOR_SHOOT_FRAME1], false);
+			else if (WarriorAnimCounter >= 2.f && WarriorAnimCounter < 3.f)
+				RenderMesh(meshList[GEO_WARRIOR_SHOOT_FRAME2], false);
+		}
 		modelStack.PopMatrix();
 		break;
 	case GameObject::GO_ARCHER:
@@ -834,8 +875,26 @@ void SceneAIAsn2::RenderGO(GameObject *go)
 		modelStack.PushMatrix();
 		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
 		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
-		//modelStack.Rotate(rotateShip, 0, 0, 1);
-		RenderMesh(meshList[GEO_MAGICIAN], false);
+		if (magician->currentState == GameObject::STATE_MOVE)
+		{
+			if (MagicianAnimCounter >= 0.f && MagicianAnimCounter < 1.f)
+				RenderMesh(meshList[GEO_MAGICIAN_WALK_FRAME0], false);
+			else if (MagicianAnimCounter >= 1.f && MagicianAnimCounter < 2.f)
+				RenderMesh(meshList[GEO_MAGICIAN_WALK_FRAME1], false);
+			else if (MagicianAnimCounter >= 2.f && MagicianAnimCounter < 3.f)
+				RenderMesh(meshList[GEO_MAGICIAN_WALK_FRAME2], false);
+			else if (MagicianAnimCounter >= 3.f)
+				RenderMesh(meshList[GEO_MAGICIAN_WALK_FRAME3], false);
+		}
+		else if (magician->currentState == GameObject::STATE_ATTACK)
+		{
+			if (MagicianAnimCounter >= 0.f && MagicianAnimCounter < 1.f)
+				RenderMesh(meshList[GEO_MAGICIAN_SHOOT_FRAME0], false);
+			else if (MagicianAnimCounter >= 1.f && MagicianAnimCounter < 2.f)
+				RenderMesh(meshList[GEO_MAGICIAN_SHOOT_FRAME1], false);
+			else if (MagicianAnimCounter >= 2.f && MagicianAnimCounter < 3.f)
+				RenderMesh(meshList[GEO_MAGICIAN_SHOOT_FRAME2], false);
+		}
 		modelStack.PopMatrix();
 		break;
 	case GameObject::GO_ARROW:
@@ -925,8 +984,9 @@ void SceneAIAsn2::ArcherAnimation()
 			{
 				ArcherShoot = true;
 				msgBoard.addMessage("Archer", "Everyone", "Shooting down the Enemy!");
+				ArcherAnimCounter = 0;
 			}
-			ArcherAnimCounter = 0;
+			//ArcherAnimCounter = 0;
 		}
 	}
 }
@@ -948,8 +1008,33 @@ void SceneAIAsn2::HealerAnimation()
 			{
 				HealerHeal = true;
 				msgBoard.addMessage("Healer", "Everyone", "Healing Complete!");
+				HealerAnimCounter = 0;
 			}
-			HealerAnimCounter = 0;
+			
+		}
+	}
+}
+
+void SceneAIAsn2::WarriorAnimation()
+{
+	if (warrior->currentState == GameObject::STATE_MOVE)
+	{
+		WarriorAnimCounter += 0.1f;
+		if (WarriorAnimCounter > 4)
+			WarriorAnimCounter = 0;
+	}
+	else if (warrior->currentState == GameObject::STATE_ATTACK)
+	{
+		WarriorAnimCounter += 0.05f;
+		if (WarriorAnimCounter > 3)
+		{
+			if (WarriorAnimCounter >= 2.f)
+			{
+				WarriorAttack = true;
+				WarriorAnimCounter = 0;
+				//msgBoard.addMessage("Archer", "Everyone", "Shooting down the Enemy!");
+			}
+
 		}
 	}
 }

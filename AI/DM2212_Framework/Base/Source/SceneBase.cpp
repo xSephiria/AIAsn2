@@ -182,6 +182,38 @@ void SceneBase::Init()
 	meshList[GEO_HEALER_SHOOT_FRAME2] = MeshBuilder::GenerateQuad("Healer_Shoot2", Color(1, 1, 1), 1);
 	meshList[GEO_HEALER_SHOOT_FRAME2]->textureID = LoadTGA("Image//Healer//heal2.tga");
 
+	meshList[GEO_WARRIOR_WALK_FRAME0] = MeshBuilder::GenerateQuad("Warrior_Walk0", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_WALK_FRAME0]->textureID = LoadTGA("Image//Warrior//walk0.tga");
+	meshList[GEO_WARRIOR_WALK_FRAME1] = MeshBuilder::GenerateQuad("Warrior_Walk1", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_WALK_FRAME1]->textureID = LoadTGA("Image//Warrior//walk1.tga");
+	meshList[GEO_WARRIOR_WALK_FRAME2] = MeshBuilder::GenerateQuad("Warrior_Walk2", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_WALK_FRAME2]->textureID = LoadTGA("Image//Warrior//walk2.tga");
+	meshList[GEO_WARRIOR_WALK_FRAME3] = MeshBuilder::GenerateQuad("Warrior_Walk3", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_WALK_FRAME3]->textureID = LoadTGA("Image//Warrior//walk3.tga");
+
+	meshList[GEO_WARRIOR_SHOOT_FRAME0] = MeshBuilder::GenerateQuad("Warrior_Shoot0", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_SHOOT_FRAME0]->textureID = LoadTGA("Image//Warrior//attack2_0.tga");
+	meshList[GEO_WARRIOR_SHOOT_FRAME1] = MeshBuilder::GenerateQuad("Warrior_Shoot1", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_SHOOT_FRAME1]->textureID = LoadTGA("Image//Warrior//attack2_1.tga");
+	meshList[GEO_WARRIOR_SHOOT_FRAME2] = MeshBuilder::GenerateQuad("Warrior_Shoot2", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_SHOOT_FRAME2]->textureID = LoadTGA("Image//Warrior//attack2_2.tga");
+
+	meshList[GEO_MAGICIAN_WALK_FRAME0] = MeshBuilder::GenerateQuad("Magician_Walk0", Color(1, 1, 1), 1);
+	meshList[GEO_MAGICIAN_WALK_FRAME0]->textureID = LoadTGA("Image//Magician//walk0.tga");
+	meshList[GEO_MAGICIAN_WALK_FRAME1] = MeshBuilder::GenerateQuad("Magician_Walk1", Color(1, 1, 1), 1);
+	meshList[GEO_MAGICIAN_WALK_FRAME1]->textureID = LoadTGA("Image//Magician//walk1.tga");
+	meshList[GEO_MAGICIAN_WALK_FRAME2] = MeshBuilder::GenerateQuad("Magician_Walk2", Color(1, 1, 1), 1);
+	meshList[GEO_MAGICIAN_WALK_FRAME2]->textureID = LoadTGA("Image//Magician//walk2.tga");
+	meshList[GEO_MAGICIAN_WALK_FRAME3] = MeshBuilder::GenerateQuad("Magician_Walk3", Color(1, 1, 1), 1);
+	meshList[GEO_MAGICIAN_WALK_FRAME3]->textureID = LoadTGA("Image//Magician//walk3.tga");
+
+	meshList[GEO_MAGICIAN_SHOOT_FRAME0] = MeshBuilder::GenerateQuad("Magician_Shoot0", Color(1, 1, 1), 1);
+	meshList[GEO_MAGICIAN_SHOOT_FRAME0]->textureID = LoadTGA("Image//Magician//attack1.tga");
+	meshList[GEO_MAGICIAN_SHOOT_FRAME1] = MeshBuilder::GenerateQuad("Magician_Shoot1", Color(1, 1, 1), 1);
+	meshList[GEO_MAGICIAN_SHOOT_FRAME1]->textureID = LoadTGA("Image//Magician//attack2.tga");
+	meshList[GEO_MAGICIAN_SHOOT_FRAME2] = MeshBuilder::GenerateQuad("Magician_Shoot2", Color(1, 1, 1), 1);
+	meshList[GEO_MAGICIAN_SHOOT_FRAME2]->textureID = LoadTGA("Image//Magician//attack3.tga");
+
 
 	bLightEnabled = false;
 }
