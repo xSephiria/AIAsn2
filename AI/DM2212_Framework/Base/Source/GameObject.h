@@ -18,6 +18,8 @@ struct GameObject
 		GO_ARCHER,
 		GO_ARROW,
 		GO_FIREBALL,
+		GO_HEROTOWER,
+		GO_ENEMYTOWER,
 		GO_TOTAL, //must be last
 	};
 

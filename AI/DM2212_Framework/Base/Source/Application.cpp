@@ -87,11 +87,18 @@ void Application::Init()
 	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); //We don't want the old OpenGL 
 
+	const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
 
+	glfwWindowHint(GLFW_RED_BITS, mode->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, mode->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, mode->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, mode->refreshRate);
 	//Create a window and create its OpenGL context
-	m_width = 800;
-	m_height = 600;
-	m_window = glfwCreateWindow(m_width, m_height, "Physics", NULL, NULL);
+	//m_width = 800;
+	//m_height = 600;
+	m_width = mode->width;
+	m_height = mode->height;
+	m_window = glfwCreateWindow(m_width, m_height, "AI", NULL, NULL);
 
 	//If the window couldn't be created
 	if (!m_window)

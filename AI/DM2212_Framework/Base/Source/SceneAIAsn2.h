@@ -36,6 +36,9 @@ private:
 	void RenderGO(GameObject *go);
 	void Render();
 	void Exit();
+
+
+
 	GameObject* FetchGO();
 
 	float DistXY(Vector3 first, Vector3 second);
@@ -61,6 +64,10 @@ private:
 	GameObject* archer;
 	GameObject* arrow;
 	void CreateArrow();
+
+	GameObject* HeroTower;
+
+	GameObject* EnemyTower;
 
 	GameObject* magician;
 	GameObject* fireball;

@@ -94,6 +94,7 @@ public:
 
 	Color color;
 	GameObject* FetchGO();
+
 protected:
 	unsigned m_vertexArrayID;
 	Mesh* meshList[NUM_GEOMETRY];

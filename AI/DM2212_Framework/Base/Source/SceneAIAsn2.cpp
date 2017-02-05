@@ -44,6 +44,22 @@ void SceneAIAsn2::Init()
 	fireball->Dmg = 20;
 	m_goList.push_back(fireball);
 
+	HeroTower = FetchGO();
+	HeroTower->type = GameObject::GO_HEROTOWER;
+	HeroTower->active = true;
+	HeroTower->pos.Set(0, 0, 0);
+	HeroTower->scale.Set(10, 10, 10);
+	HeroTower->vel.Set(0, 0, 0);
+	HeroTower->job = GameObject::JOB_NONE;
+
+	EnemyTower = FetchGO();
+	EnemyTower->type = GameObject::GO_ENEMYTOWER;
+	EnemyTower->active = true;
+	EnemyTower->pos.Set(150, 0, 0);
+	EnemyTower->scale.Set(10, 10, 10);
+	EnemyTower->vel.Set(0, 0, 0);
+	EnemyTower->job = GameObject::JOB_NONE;
+
 	/*warrior = FetchGO();
 	warrior->type = GameObject::GO_WARRIOR;
 	warrior->pos.Set(0, 10, 0);
@@ -52,14 +68,6 @@ void SceneAIAsn2::Init()
 	warrior->Dmg = 10;
 	warrior->HP = 150;
 	warrior->job = GameObject::JOB_WARRIOR;*/
-
-	arrow = new GameObject(GameObject::GO_ARROW);
-	/*arrow->active = false;
-	arrow->pos.Set(0, 0, 0);
-	arrow->scale.Set(3, 3, 3);
-	arrow->vel.Set(15, 0, 0);
-	arrow->Dmg = 10;
-	m_goList.push_back(arrow);*/
 
 	archer = FetchGO();
 	archer->type = GameObject::GO_ARCHER;
@@ -116,7 +124,18 @@ void SceneAIAsn2::Update(double dt)
 	FPS = 1 / dt;
 
 	ArcherAnimation(dt);
-	
+	std::cout << ArcherAnimCounter <<  " " << FPS << std::endl;
+
+	for (std::vector<GameObject *> ::iterator it = m_goList.begin(); it != m_goList.end(); )
+	{
+		if ((*it)->active == false)
+		{
+			delete *it;
+			it = m_goList.erase(it);
+		}
+		else
+			it++;
+	}
 
 	if (state == GAMEPLAY)
 	{
@@ -125,7 +144,7 @@ void SceneAIAsn2::Update(double dt)
 		{
 			mob = new GameObject(GameObject::GO_MOB);
 			mob->type = GameObject::GO_MOB;
-			mob->pos.Set(150, 10, 0);
+			mob->pos.Set(100, 10, 0);
 			mob->vel.Set(-10, 0, 0);
 			mob->scale.Set(3, 3, 3);
 			mob->Dmg = 5;
@@ -135,7 +154,6 @@ void SceneAIAsn2::Update(double dt)
 			mobSpawnTimer = 5.f;
 			mobcount++;
 			m_goList.push_back(mob);
-			//CreateMob();
 		}
 
 		if (ArcherShoot)
@@ -148,6 +166,7 @@ void SceneAIAsn2::Update(double dt)
 			arrow->Dmg = 20;
 			m_goList.push_back(arrow);
 		}
+
 		//if (warrior->active)
 		//{
 		//	if (warrior->HP > 0)
@@ -171,9 +190,7 @@ void SceneAIAsn2::Update(double dt)
 		//					if (warrior->currentState != GameObject::STATE_ATTACK && mob->active == false)
 		//						warrior->vel.Set(10, 0, 0);
 		//				}
-
 		//			}
-
 		//		}
 		//		else if (warrior->currentState == GameObject::STATE_ATTACK)
 		//		{
@@ -184,7 +201,6 @@ void SceneAIAsn2::Update(double dt)
 		//					if (DistXY(warrior->pos, mob->pos) <= 50.f && mob->active)
 		//					{
 		//						warriorAFrame -= 1.f;
-
 		//						if (warriorAFrame <= 0.f)
 		//						{
 		//							WarriorGuard = Math::RandIntMinMax(0, 3);
@@ -192,7 +208,6 @@ void SceneAIAsn2::Update(double dt)
 		//							if (WarriorGuard == 0)
 		//							{
 		//								warrior->Def = 3;
-
 		//							}
 		//							else if (WarriorGuard > 0)
 		//							{
@@ -202,11 +217,9 @@ void SceneAIAsn2::Update(double dt)
 		//							}
 		//							warriorAFrame = 50.f;
 		//						}
-
 		//					}
 		//				}
 		//			}
-
 		//		}
 		//	}
 		//	else
@@ -219,11 +232,8 @@ void SceneAIAsn2::Update(double dt)
 		//			{
 		//				go = NULL;
 		//			}
-
 		//		}
-
 		//	}
-
 		//}
 
 		if (archer->active)
@@ -306,8 +316,6 @@ void SceneAIAsn2::Update(double dt)
 			{
 				if (PerMob->active)
 				{
-					//std::cout << PerMob->currentState << std::endl;
-
 					if (PerMob->HP > 0)
 					{
 						if (PerMob->currentState == GameObject::STATE_MOVE) // 4
@@ -735,6 +743,20 @@ void SceneAIAsn2::RenderGO(GameObject *go)
 		RenderMesh(meshList[GEO_BULLET], false);
 		modelStack.PopMatrix();
 		break;
+	case GameObject::GO_ENEMYTOWER:
+		modelStack.PushMatrix();
+		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
+		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
+		RenderMesh(meshList[GEO_BULLET], false);
+		modelStack.PopMatrix();
+		break;
+	case GameObject::GO_HEROTOWER:
+		modelStack.PushMatrix();
+		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
+		modelStack.Scale(go->scale.x, go->scale.y, go->scale.z);
+		RenderMesh(meshList[GEO_BULLET], false);
+		modelStack.PopMatrix();
+		break;
 	default:
 		modelStack.PushMatrix();
 		modelStack.Translate(go->pos.x, go->pos.y, go->pos.z);
@@ -793,7 +815,6 @@ void SceneAIAsn2::ArcherAnimation(double dt)
 			ArcherAnimCounter = 0;
 		}
 	}
-	
 }
 
 void SceneAIAsn2::CreateArrow()
