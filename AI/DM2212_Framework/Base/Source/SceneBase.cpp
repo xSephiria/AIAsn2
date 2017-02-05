@@ -166,6 +166,23 @@ void SceneBase::Init()
 	meshList[GEO_ARCHER_SHOOT_FRAME2] = MeshBuilder::GenerateQuad("Archer_Shoot2", Color(1, 1, 1), 1);
 	meshList[GEO_ARCHER_SHOOT_FRAME2]->textureID = LoadTGA("Image//Archer//shoot2.tga");
 
+	meshList[GEO_HEALER_WALK_FRAME0] = MeshBuilder::GenerateQuad("Healer_Walk0", Color(1, 1, 1), 1);
+	meshList[GEO_HEALER_WALK_FRAME0]->textureID = LoadTGA("Image//Healer//walk0.tga");
+	meshList[GEO_HEALER_WALK_FRAME1] = MeshBuilder::GenerateQuad("Healer_Walk1", Color(1, 1, 1), 1);
+	meshList[GEO_HEALER_WALK_FRAME1]->textureID = LoadTGA("Image//Healer//walk1.tga");
+	meshList[GEO_HEALER_WALK_FRAME2] = MeshBuilder::GenerateQuad("Healer_Walk2", Color(1, 1, 1), 1);
+	meshList[GEO_HEALER_WALK_FRAME2]->textureID = LoadTGA("Image//Healer//walk2.tga");
+	meshList[GEO_HEALER_WALK_FRAME3] = MeshBuilder::GenerateQuad("Healer_Walk3", Color(1, 1, 1), 1);
+	meshList[GEO_HEALER_WALK_FRAME3]->textureID = LoadTGA("Image//Healer//walk3.tga");
+
+	meshList[GEO_HEALER_SHOOT_FRAME0] = MeshBuilder::GenerateQuad("Healer_Shoot0", Color(1, 1, 1), 1);
+	meshList[GEO_HEALER_SHOOT_FRAME0]->textureID = LoadTGA("Image//Healer//heal0.tga");
+	meshList[GEO_HEALER_SHOOT_FRAME1] = MeshBuilder::GenerateQuad("Healer_Shoot1", Color(1, 1, 1), 1);
+	meshList[GEO_HEALER_SHOOT_FRAME1]->textureID = LoadTGA("Image//Healer//heal1.tga");
+	meshList[GEO_HEALER_SHOOT_FRAME2] = MeshBuilder::GenerateQuad("Healer_Shoot2", Color(1, 1, 1), 1);
+	meshList[GEO_HEALER_SHOOT_FRAME2]->textureID = LoadTGA("Image//Healer//heal2.tga");
+
+
 	bLightEnabled = false;
 }
 

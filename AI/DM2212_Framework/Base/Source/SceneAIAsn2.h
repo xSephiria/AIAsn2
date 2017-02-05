@@ -91,12 +91,16 @@ private:
 	int arrowcount;
 	float FPS;
 
-	void ArcherAnimation(double dt);
-	void WarriorAnimation(double dt);
+	void ArcherAnimation();
+	void WarriorAnimation();
+	void HealerAnimation();
+	void MagicianAnimation();
 	float ArcherAnimCounter;
 	float WarriorAnimCounter;
+	float HealerAnimCounter;
 
 	bool ArcherShoot;
+	bool HealerHeal;
 
 };
 
