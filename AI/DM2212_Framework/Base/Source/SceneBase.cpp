@@ -145,6 +145,10 @@ void SceneBase::Init()
 	meshList[GEO_MAGICIAN] = MeshBuilder::GenerateQuad("Healer", Color(1, 1, 1), 1);
 	meshList[GEO_MAGICIAN]->textureID = LoadTGA("Image//magician.tga");
 
+	meshList[GEO_TOWER] = MeshBuilder::GenerateQuad("Tower", Color(1, 1, 1), 1);
+	meshList[GEO_TOWER]->textureID = LoadTGA("Image//Towers.tga");
+
+
 	meshList[GEO_ARCHER_WALK_FRAME0] = MeshBuilder::GenerateQuad("Archer_Walk0", Color(1, 1, 1), 1);
 	meshList[GEO_ARCHER_WALK_FRAME0]->textureID = LoadTGA("Image//Archer//walk0.tga");
 	meshList[GEO_ARCHER_WALK_FRAME1] = MeshBuilder::GenerateQuad("Archer_Walk1", Color(1, 1, 1), 1);

@@ -43,6 +43,8 @@ struct GameObject
 		JOB_WARRIOR,
 		JOB_ARCHER,
 		JOB_MOB,
+		JOB_HTOWER,
+		JOB_ETOWER,
 		JOB_NONE,
 		NUM_JOB
 	};
