@@ -4,6 +4,7 @@
 #include "GameObject.h"
 #include <vector>
 #include "SceneBase.h"
+#include "MessageBoard.h"
 #include <sstream>
 
 enum UNITS{
@@ -42,6 +43,7 @@ private:
 
 	UNITS units;
 	STATE state;
+	MessageBoard msgBoard;
 
 	//Parameters
 	std::vector<GameObject *> m_goList;
@@ -58,8 +60,8 @@ private:
 
 	GameObject* archer;
 
-
 	GameObject* magician;
+	GameObject* fireball;
 	float magicianRechargeTimer;
 
 

@@ -17,6 +17,7 @@ struct GameObject
 		GO_WARRIOR,
 		GO_ARCHER,
 		GO_ARROW,
+		GO_FIREBALL,
 		GO_TOTAL, //must be last
 	};
 
@@ -29,6 +30,7 @@ struct GameObject
 		STATE_MOVE,
 		STATE_STOP,
 		STATE_HEAL,
+		STATE_RECHARGE,
 		NUM_STATES
 	};
 
