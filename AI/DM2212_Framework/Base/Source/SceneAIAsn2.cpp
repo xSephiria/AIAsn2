@@ -54,12 +54,12 @@ void SceneAIAsn2::Init()
 	warrior->job = GameObject::JOB_WARRIOR;*/
 
 	arrow = new GameObject(GameObject::GO_ARROW);
-	arrow->active = false;
+	/*arrow->active = false;
 	arrow->pos.Set(0, 0, 0);
 	arrow->scale.Set(3, 3, 3);
 	arrow->vel.Set(15, 0, 0);
 	arrow->Dmg = 10;
-	m_goList.push_back(arrow);
+	m_goList.push_back(arrow);*/
 
 	archer = FetchGO();
 	archer->type = GameObject::GO_ARCHER;
@@ -125,7 +125,7 @@ void SceneAIAsn2::Update(double dt)
 		{
 			mob = new GameObject(GameObject::GO_MOB);
 			mob->type = GameObject::GO_MOB;
-			mob->pos.Set(100, 10, 0);
+			mob->pos.Set(150, 10, 0);
 			mob->vel.Set(-10, 0, 0);
 			mob->scale.Set(3, 3, 3);
 			mob->Dmg = 5;
@@ -142,9 +142,8 @@ void SceneAIAsn2::Update(double dt)
 		{
 			arrow = new GameObject(GameObject::GO_ARROW);
 			arrow->type = GameObject::GO_ARROW;
-			arrow->active = false;
 			arrow->pos.Set(0, 0, 0);
-			arrow->scale.Set(3, 3, 3);
+			arrow->scale.Set(1, 1, 1);
 			arrow->vel.Set(15, 0, 0);
 			arrow->Dmg = 20;
 			m_goList.push_back(arrow);
@@ -229,17 +228,20 @@ void SceneAIAsn2::Update(double dt)
 
 		if (archer->active)
 		{
-			if (arrow->active)
+			for (auto arrowList : m_goList)
 			{
-				for (std::vector<GameObject*>::iterator mob = m_goList.begin(); mob != m_goList.end(); mob++)
+				if (arrowList->type == GameObject::GO_ARROW)
 				{
-					if (!(*mob)->active || (*mob)->job != GameObject::JOB_MOB)
-						continue;
-					if (DistXY(arrow->pos, (*mob)->pos) < 50.f)
+					for (std::vector<GameObject*>::iterator mob = m_goList.begin(); mob != m_goList.end(); mob++)
 					{
-						(*mob)->HP -= arrow->Dmg;
-						arrow->active = false;
-						break;
+						if (!(*mob)->active || (*mob)->job != GameObject::JOB_MOB || !(arrowList)->active)
+							continue;
+						if (DistXY(arrowList->pos, (*mob)->pos) < 100.f)
+						{
+							(*mob)->HP -= arrowList->Dmg;
+							arrowList->active = false;
+							break;
+						}
 					}
 				}
 			}
@@ -256,7 +258,7 @@ void SceneAIAsn2::Update(double dt)
 					{
 						if (mob->job == GameObject::JOB_MOB)
 						{
-							if (DistXY(archer->pos, mob->pos) < 1000.f && mob->active)
+							if (DistXY(archer->pos, mob->pos) < 500.f && mob->active)
 							{
 								archer->vel.SetZero();
 								archer->currentState = GameObject::STATE_ATTACK;
@@ -270,7 +272,8 @@ void SceneAIAsn2::Update(double dt)
 				{
 					for (auto mob : m_goList)
 					{
-
+						if (mob->active == false)
+							continue;
 						if (mob->job == GameObject::JOB_MOB)
 						{
 							if (ArcherShoot == true)
@@ -278,6 +281,8 @@ void SceneAIAsn2::Update(double dt)
 								arrow->pos = archer->pos;
 								arrow->active = true;
 								ArcherShoot = false;
+								archer->currentState = GameObject::STATE_MOVE;
+								break;
 							}
 						}
 					}
@@ -307,7 +312,6 @@ void SceneAIAsn2::Update(double dt)
 					{
 						if (PerMob->currentState == GameObject::STATE_MOVE) // 4
 						{
-
 							for (auto go : m_goList)
 							{
 								if (go->job == GameObject::JOB_NONE || go->job == GameObject::JOB_MOB/* || go->active == false*/)
