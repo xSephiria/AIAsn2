@@ -128,6 +128,11 @@ void SceneAIAsn2::Update(double dt)
 
 	for (std::vector<GameObject *> ::iterator it = m_goList.begin(); it != m_goList.end(); )
 	{
+		if ((*it)->type == GameObject::GO_FIREBALL)
+		{
+			it++;
+			continue;
+		}
 		if ((*it)->active == false)
 		{
 			delete *it;
@@ -260,7 +265,11 @@ void SceneAIAsn2::Update(double dt)
 			{
 				if (archer->HP < 70)
 				{
-					archer->isHealTarget = true;
+					if (archer->isHealTarget == false)
+					{
+						archer->isHealTarget = true;
+						msgBoard.addMessage("Archer", "Healer", "Heal Me...");
+					}
 				}
 				if (archer->currentState == GameObject::STATE_MOVE)
 				{
@@ -811,7 +820,10 @@ void SceneAIAsn2::ArcherAnimation(double dt)
 		if (ArcherAnimCounter > 3)
 		{
 			if (ArcherAnimCounter >= 2.f)
+			{
 				ArcherShoot = true;
+				msgBoard.addMessage("Archer", "Everyone", "Shooting down the Enemy!");
+			}
 			ArcherAnimCounter = 0;
 		}
 	}
