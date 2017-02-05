@@ -21,6 +21,7 @@
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\Mesh.cpp" />
     <ClCompile Include="Source\MeshBuilder.cpp" />
+    <ClCompile Include="Source\MessageBoard.cpp" />
     <ClCompile Include="Source\SceneAIAsn2.cpp" />
     <ClCompile Include="Source\SceneBase.cpp" />
     <ClCompile Include="Source\shader.cpp" />
@@ -40,6 +41,7 @@
     <ClInclude Include="Source\Material.h" />
     <ClInclude Include="Source\Mesh.h" />
     <ClInclude Include="Source\MeshBuilder.h" />
+    <ClInclude Include="Source\MessageBoard.h" />
     <ClInclude Include="Source\Scene.h" />
     <ClInclude Include="Source\SceneAIAsn2.h" />
     <ClInclude Include="Source\SceneBase.h" />
