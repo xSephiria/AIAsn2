@@ -62,16 +62,16 @@ void SceneAIAsn2::Init()
 	EnemyTower->HP = 2000;
 	EnemyTower->job = GameObject::JOB_ETOWER;
 
-	/*warrior = FetchGO();
+	warrior = FetchGO();
 	warrior->type = GameObject::GO_WARRIOR;
 	warrior->pos.Set(0, 5, 0);
 	warrior->vel.Set(10, 0, 0);
 	warrior->scale.Set(5, 5, 1);
 	warrior->Dmg = 10;
 	warrior->HP = 150;
-	warrior->job = GameObject::JOB_WARRIOR;*/
+	warrior->job = GameObject::JOB_WARRIOR;
 
-	archer = FetchGO();
+	/*archer = FetchGO();
 	archer->type = GameObject::GO_ARCHER;
 	archer->active = true;
 	archer->pos.Set(HeroTower->pos.x, 5, 0);
@@ -88,7 +88,7 @@ void SceneAIAsn2::Init()
 	healer->Dmg = 0;
 	healer->job = GameObject::JOB_HEALER;
 	healerAOETimer = 14.f;
-	healerCooldown = 0.f;
+	healerCooldown = 0.f;*/
 
 	for (int i = 0; i < 10; i++)
 	{
@@ -127,8 +127,8 @@ void SceneAIAsn2::Update(double dt)
 	SceneBase::Update(dt);
 	FPS = 1 / dt;
 
-	ArcherAnimation();
-	HealerAnimation();
+	//ArcherAnimation();
+	//HealerAnimation();
 	std::cout << HealerAnimCounter <<  " " << FPS << std::endl;
 
 	for (std::vector<GameObject *> ::iterator it = m_goList.begin(); it != m_goList.end(); )
@@ -150,7 +150,7 @@ void SceneAIAsn2::Update(double dt)
 	if (state == GAMEPLAY)
 	{
 		mobSpawnTimer -= dt;
-		if (mobSpawnTimer <= 0.f && mobcount < 2)
+		if (mobSpawnTimer <= 0.f && mobcount < 1)
 		{
 			mob = new GameObject(GameObject::GO_MOB);
 			mob->type = GameObject::GO_MOB;
@@ -177,185 +177,201 @@ void SceneAIAsn2::Update(double dt)
 			m_goList.push_back(arrow);
 		}
 
-		//if (warrior->active)
-		//{
-		//	if (warrior->HP > 0)
-		//	{
-		//		if (warrior->HP < 100)
-		//		{
-		//			warrior->isHealTarget = true;
-		//		}
-		//		if (warrior->currentState == GameObject::STATE_MOVE)
-		//		{
-		//			for (auto mob : m_goList)
-		//			{
-		//				if (mob->job == GameObject::JOB_MOB)
-		//				{
-		//					if (DistXY(warrior->pos, mob->pos) < 50.f && mob->active)
-		//					{
-		//						warrior->vel.SetZero();
-		//						warrior->currentState = GameObject::STATE_ATTACK;
-		//						//mob->currentState = GameObject::STATE_ATTACK;
-		//					}
-		//					if (warrior->currentState != GameObject::STATE_ATTACK && mob->active == false)
-		//						warrior->vel.Set(10, 0, 0);
-		//				}
-		//			}
-		//		}
-		//		else if (warrior->currentState == GameObject::STATE_ATTACK)
-		//		{
-		//			for (auto mob : m_goList)
-		//			{
-		//				if (mob->job == GameObject::JOB_MOB)
-		//				{
-		//					if (DistXY(warrior->pos, mob->pos) <= 50.f && mob->active)
-		//					{
-		//						warriorAFrame -= 1.f;
-		//						if (warriorAFrame <= 0.f)
-		//						{
-		//							WarriorGuard = Math::RandIntMinMax(0, 3);
-		//							warrior->Def = 0;
-		//							if (WarriorGuard == 0)
-		//							{
-		//								warrior->Def = 3;
-		//							}
-		//							else if (WarriorGuard > 0)
-		//							{
-		//								mob->HP -= warrior->Dmg;
-		//								if (mob->HP <= 0)
-		//									warrior->currentState = GameObject::STATE_MOVE;
-		//							}
-		//							warriorAFrame = 50.f;
-		//						}
-		//					}
-		//				}
-		//			}
-		//		}
-		//	}
-		//	else
-		//	{
-		//		warrior->currentState = GameObject::STATE_DEAD;
-		//		warrior->active = false;
-		//		for (auto go : m_goList)
-		//		{
-		//			if (go->active == false)
-		//			{
-		//				go = NULL;
-		//			}
-		//		}
-		//	}
-		//}
 
-		if (archer->active)
+
+		if (warrior->active)
 		{
-			for (auto arrowList : m_goList)
+			if (warrior->HP > 0)
 			{
-				if (arrowList->type == GameObject::GO_ARROW)
+				if (warrior->HP < 100)
 				{
-					for (std::vector<GameObject*>::iterator mob = m_goList.begin(); mob != m_goList.end(); mob++)
-					{
-						if (!(*mob)->active || (*mob)->job != GameObject::JOB_MOB || !(arrowList)->active)
-							continue;
-						if ( (*mob)->job == GameObject::JOB_MOB && DistXY(arrowList->pos, (*mob)->pos) < 100.f)
-						{
-							(*mob)->HP -= arrowList->Dmg;
-							arrowList->active = false;
-							break;
-						}
-					}
-					if (DistXY(arrowList->pos, EnemyTower->pos) < 100.f && EnemyTower->active)
-					{
-						EnemyTower->HP -= arrowList->Dmg;
-						arrowList->active = false;
-						break;
-					}
+					warrior->isHealTarget = true;
 				}
-			}
-			if (archer->HP > 0)
-			{
-				if (archer->HP < 70)
-				{
-					if (archer->isHealTarget == false)
-					{
-						archer->isHealTarget = true;
-						msgBoard.addMessage("Archer", "Healer", "Heal Me...");
-					}
-				}
-				if (archer->currentState == GameObject::STATE_MOVE)
+				if (warrior->currentState == GameObject::STATE_MOVE)
 				{
 					for (auto mob : m_goList)
 					{
-						if (mob->job == GameObject::JOB_MOB || mob->job == GameObject::JOB_ETOWER)
+						if (warrior->currentState == GameObject::STATE_MOVE)
 						{
-							if (mob->job == GameObject::JOB_MOB && DistXY(archer->pos, mob->pos) < 500.f && mob->active)
+							for (auto mob : m_goList)
 							{
-								archer->vel.SetZero();
-								archer->currentState = GameObject::STATE_ATTACK;
-								break;
-							}
-							if (mob->job == GameObject::JOB_ETOWER && DistXY(archer->pos, mob->pos) < 2000.f && mob->active)
-							{
-								archer->vel.SetZero();
-								archer->currentState = GameObject::STATE_ATTACK;
-								break;
-							}
-							else
-							{
-								archer->vel.Set(10, 0, 0);
+								if (mob->job == GameObject::JOB_MOB || mob->job == GameObject::JOB_ETOWER)
+								{
+									if (mob->job == GameObject::JOB_MOB && DistXY(warrior->pos, mob->pos) < 50.f && mob->active)
+									{
+										warrior->vel.SetZero();
+										warrior->currentState = GameObject::STATE_ATTACK;
+										break;
+									}
+									if (mob->job == GameObject::JOB_ETOWER && DistXY(warrior->pos, mob->pos) < 1000.f && mob->active)
+									{
+										warrior->vel.SetZero();
+										warrior->currentState = GameObject::STATE_ATTACK;
+										break;
+									}
+									else
+									{
+										warrior->vel.Set(10, 0, 0);
+									}
+								}
 							}
 						}
 					}
 				}
-				else if (archer->currentState == GameObject::STATE_ATTACK)
+				else if (warrior->currentState == GameObject::STATE_ATTACK)
 				{
-					bool EnemyAlive = false;
 					for (auto mob : m_goList)
 					{
-						//if (mob->active == false)
-						//	continue;
-						if (mob->job == GameObject::JOB_MOB && DistXY(archer->pos, mob->pos) < 500.f)
+						if (mob->job == GameObject::JOB_MOB)
 						{
-							EnemyAlive = true;
-							if (ArcherShoot == true && mob->active)
+							if (DistXY(warrior->pos, mob->pos) <= 50.f && mob->active)
 							{
-								arrow->pos = archer->pos;
-								arrow->active = true;
-								ArcherShoot = false;
-								break;
-							}
-							
-						}
-						if (mob->job == GameObject::JOB_ETOWER && DistXY(archer->pos, mob->pos) < 2000.f)
-						{
-							EnemyAlive = true;
-							if (ArcherShoot == true && mob->active)
-							{
-								arrow->pos = archer->pos;
-								arrow->active = true;
-								ArcherShoot = false;
-								break;
+								warriorAFrame -= 1.f;
+								if (warriorAFrame <= 0.f)
+								{
+									WarriorGuard = Math::RandIntMinMax(0, 3);
+									warrior->Def = 0;
+									if (WarriorGuard == 0)
+									{
+										warrior->Def = 3;
+									}
+									else if (WarriorGuard > 0)
+									{
+										mob->HP -= warrior->Dmg;
+										if (mob->HP <= 0)
+											warrior->currentState = GameObject::STATE_MOVE;
+									}
+									warriorAFrame = 50.f;
+								}
 							}
 						}
-						
-					}
-					if (!EnemyAlive)
-					{
-						archer->currentState = GameObject::STATE_MOVE;
 					}
 				}
-				
 			}
 			else
 			{
-				archer->currentState == GameObject::STATE_DEAD;
-				archer->active = false;
+				warrior->currentState = GameObject::STATE_DEAD;
+				warrior->active = false;
 				for (auto go : m_goList)
 				{
 					if (go->active == false)
+					{
 						go = NULL;
+					}
 				}
 			}
 		}
+
+		//if (archer->active)
+		//{
+		//	for (auto arrowList : m_goList)
+		//	{
+		//		if (arrowList->type == GameObject::GO_ARROW)
+		//		{
+		//			for (std::vector<GameObject*>::iterator mob = m_goList.begin(); mob != m_goList.end(); mob++)
+		//			{
+		//				if (!(*mob)->active || (*mob)->job != GameObject::JOB_MOB || !(arrowList)->active)
+		//					continue;
+		//				if ( (*mob)->job == GameObject::JOB_MOB && DistXY(arrowList->pos, (*mob)->pos) < 100.f)
+		//				{
+		//					(*mob)->HP -= arrowList->Dmg;
+		//					arrowList->active = false;
+		//					break;
+		//				}
+		//			}
+		//			if (DistXY(arrowList->pos, EnemyTower->pos) < 100.f && EnemyTower->active)
+		//			{
+		//				EnemyTower->HP -= arrowList->Dmg;
+		//				arrowList->active = false;
+		//				break;
+		//			}
+		//		}
+		//	}
+		//	if (archer->HP > 0)
+		//	{
+		//		if (archer->HP < 70)
+		//		{
+		//			if (archer->isHealTarget == false)
+		//			{
+		//				archer->isHealTarget = true;
+		//				msgBoard.addMessage("Archer", "Healer", "Heal Me...");
+		//			}
+		//		}
+		//		if (archer->currentState == GameObject::STATE_MOVE)
+		//		{
+		//			for (auto mob : m_goList)
+		//			{
+		//				if (mob->job == GameObject::JOB_MOB || mob->job == GameObject::JOB_ETOWER)
+		//				{
+		//					if (mob->job == GameObject::JOB_MOB && DistXY(archer->pos, mob->pos) < 500.f && mob->active)
+		//					{
+		//						archer->vel.SetZero();
+		//						archer->currentState = GameObject::STATE_ATTACK;
+		//						break;
+		//					}
+		//					if (mob->job == GameObject::JOB_ETOWER && DistXY(archer->pos, mob->pos) < 2000.f && mob->active)
+		//					{
+		//						archer->vel.SetZero();
+		//						archer->currentState = GameObject::STATE_ATTACK;
+		//						break;
+		//					}
+		//					else
+		//					{
+		//						archer->vel.Set(10, 0, 0);
+		//					}
+		//				}
+		//			}
+		//		}
+		//		else if (archer->currentState == GameObject::STATE_ATTACK)
+		//		{
+		//			bool EnemyAlive = false;
+		//			for (auto mob : m_goList)
+		//			{
+		//				if (mob->active == false)
+		//					continue;
+		//				if (mob->job == GameObject::JOB_MOB && DistXY(archer->pos, mob->pos) < 500.f)
+		//				{
+		//					EnemyAlive = true;
+		//					if (ArcherShoot == true && mob->active)
+		//					{
+		//						arrow->pos = archer->pos;
+		//						arrow->active = true;
+		//						ArcherShoot = false;
+		//						break;
+		//					}
+		//					
+		//				}
+		//				if (mob->job == GameObject::JOB_ETOWER && DistXY(archer->pos, mob->pos) < 2000.f)
+		//				{
+		//					EnemyAlive = true;
+		//					if (ArcherShoot == true && mob->active)
+		//					{
+		//						arrow->pos = archer->pos;
+		//						arrow->active = true;
+		//						ArcherShoot = false;
+		//						break;
+		//					}
+		//				}
+		//				
+		//			}
+		//			if (!EnemyAlive)
+		//			{
+		//				archer->currentState = GameObject::STATE_MOVE;
+		//			}
+		//		}
+		//		
+		//	}
+		//	else
+		//	{
+		//		archer->currentState == GameObject::STATE_DEAD;
+		//		archer->active = false;
+		//		for (auto go : m_goList)
+		//		{
+		//			if (go->active == false)
+		//				go = NULL;
+		//		}
+		//	}
+		//}
 
 		for (auto PerMob : m_goList)
 		{
@@ -389,12 +405,12 @@ void SceneAIAsn2::Update(double dt)
 						}
 						else if (PerMob->currentState == GameObject::STATE_ATTACK) // 3 
 						{
-							//GameObject* temp;
+							GameObject* temp;
 							for (auto go : m_goList)
 							{
 								if (go->job == GameObject::JOB_NONE || go->job == GameObject::JOB_ETOWER || go->job == GameObject::JOB_MOB/* || go->active == false*/)
 									continue;
-								//temp = go;
+								temp = go;
 								if (go->active == false)
 								{
 									PerMob->currentState = GameObject::STATE_MOVE;
@@ -514,7 +530,7 @@ void SceneAIAsn2::Update(double dt)
 		//}
 
 		//Healer Codes here
-		if (healer->active)
+		/*if (healer->active)
 		{
 			if (healer->HP > 0)
 			{
@@ -617,7 +633,7 @@ void SceneAIAsn2::Update(double dt)
 				healer->currentState == GameObject::STATE_DEAD;
 				healer->active = false;
 			}
-		}
+		}*/
 
 
 	} // All gameplay checks must finish by this brace
@@ -716,7 +732,7 @@ void SceneAIAsn2::Render()
 			ss.precision(3);
 			ss << go->HP;
 			modelStack.PushMatrix();
-			modelStack.Translate(go->pos.x, go->pos.y + 5, 1);
+			modelStack.Translate(go->pos.x, go->pos.y + (go->scale.y * 0.5 ), 1);
 			modelStack.Scale(5, 5, 5);
 			RenderText(meshList[GEO_TEXT], ss.str(), Color(1, 1, 1));
 			modelStack.PopMatrix();	
