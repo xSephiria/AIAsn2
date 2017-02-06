@@ -60,6 +60,7 @@ private:
 
 	GameObject* warrior;
 	int WarriorGuard;
+	bool isGuarding;
 
 	GameObject* archer;
 	GameObject* arrow;
@@ -99,6 +100,8 @@ private:
 	float WarriorAnimCounter;
 	float HealerAnimCounter;
 	float MagicianAnimCounter;
+
+	float WarriorGuardTime;
 
 	bool ArcherShoot;
 	bool HealerHeal;

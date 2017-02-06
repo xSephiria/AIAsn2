@@ -197,6 +197,10 @@ void SceneBase::Init()
 	meshList[GEO_WARRIOR_SHOOT_FRAME1]->textureID = LoadTGA("Image//Warrior//attack2_1.tga");
 	meshList[GEO_WARRIOR_SHOOT_FRAME2] = MeshBuilder::GenerateQuad("Warrior_Shoot2", Color(1, 1, 1), 1);
 	meshList[GEO_WARRIOR_SHOOT_FRAME2]->textureID = LoadTGA("Image//Warrior//attack2_2.tga");
+	meshList[GEO_WARRIOR_SHOOT_FRAME3] = MeshBuilder::GenerateQuad("Warrior_Guard", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_SHOOT_FRAME3]->textureID = LoadTGA("Image//Warrior//attack0.tga");
+	meshList[GEO_WARRIOR_GUARD] = MeshBuilder::GenerateQuad("WarriorGuard", Color(1, 1, 1), 1);
+	meshList[GEO_WARRIOR_GUARD]->textureID = LoadTGA("Image//Warrior//Guard.tga");
 
 	meshList[GEO_MAGICIAN_WALK_FRAME0] = MeshBuilder::GenerateQuad("Magician_Walk0", Color(1, 1, 1), 1);
 	meshList[GEO_MAGICIAN_WALK_FRAME0]->textureID = LoadTGA("Image//Magician//walk0.tga");
