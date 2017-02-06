@@ -218,6 +218,9 @@ void SceneBase::Init()
 	meshList[GEO_MAGICIAN_SHOOT_FRAME2] = MeshBuilder::GenerateQuad("Magician_Shoot2", Color(1, 1, 1), 1);
 	meshList[GEO_MAGICIAN_SHOOT_FRAME2]->textureID = LoadTGA("Image//Magician//attack3.tga");
 
+	meshList[GEO_MAGICIAN_RECHARGE] = MeshBuilder::GenerateQuad("Magician_Shoot2", Color(1, 1, 1), 1);
+	meshList[GEO_MAGICIAN_RECHARGE]->textureID = LoadTGA("Image//Magician//recharge.tga");
+
 
 	bLightEnabled = false;
 }

@@ -107,6 +107,7 @@ private:
 	bool HealerHeal;
 	bool WarriorAttack;
 	bool MagicianAttack;
+	bool MagicianEnemy;
 
 };
 

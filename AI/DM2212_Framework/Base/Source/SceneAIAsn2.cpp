@@ -26,15 +26,15 @@ void SceneAIAsn2::Init()
 	state = GAMEPLAY;
 	//tempGS = STAGE1;
 
-	/*magician = FetchGO();
+	magician = FetchGO();
 	magician->type = GameObject::GO_MAGICIAN;
 	magician->active = true;
-	magician->pos.Set(0, 12, -1);
+	magician->pos.Set(0, 12, 0);
 	magician->vel.Set(10, 0, 0);
 	magician->scale.Set(10, 10, 5);
 	magician->Dmg = 10;
 	magician->job = GameObject::JOB_MAGICIAN;
-	magicianRechargeTimer = 0.f;*/
+	magicianRechargeTimer = 0.f;
 
 	fireball = new GameObject(GameObject::GO_FIREBALL);
 	fireball->active = false;
@@ -62,14 +62,14 @@ void SceneAIAsn2::Init()
 	EnemyTower->HP = 2000;
 	EnemyTower->job = GameObject::JOB_ETOWER;
 
-	warrior = FetchGO();
+	/*warrior = FetchGO();
 	warrior->type = GameObject::GO_WARRIOR;
 	warrior->pos.Set(0, 12, 0);
 	warrior->vel.Set(10, 0, 0);
 	warrior->scale.Set(10, 10, 1);
 	warrior->Dmg = 10;
 	warrior->HP = 150;
-	warrior->job = GameObject::JOB_WARRIOR;
+	warrior->job = GameObject::JOB_WARRIOR;*/
 
 	/*archer = FetchGO();
 	archer->type = GameObject::GO_ARCHER;
@@ -117,6 +117,7 @@ void SceneAIAsn2::Init()
 	HealerHeal = false;
 	WarriorAttack = false;
 	MagicianAttack = false;
+	MagicianEnemy = false;
 	arrowcount = 0;
 
 	mobSpawnTimer = 5.f;
@@ -136,8 +137,9 @@ void SceneAIAsn2::Update(double dt)
 
 	//ArcherAnimation();
 	//HealerAnimation();
-	WarriorAnimation();
-	std::cout << WarriorGuardTime << " " << isGuarding << std::endl;
+	//WarriorAnimation();
+	MagicianAnimation();
+	std::cout << MagicianAnimCounter << " " << magician->currentState  << std::endl;
 
 	for (std::vector<GameObject *> ::iterator it = m_goList.begin(); it != m_goList.end(); )
 	{
@@ -187,7 +189,7 @@ void SceneAIAsn2::Update(double dt)
 
 
 
-		if (warrior->active)
+		/*if (warrior->active)
 		{
 			if (warrior->HP > 0)
 			{
@@ -287,7 +289,7 @@ void SceneAIAsn2::Update(double dt)
 					}
 				}
 			}
-		}
+		}*/
 
 		//if (archer->active)
 		//{
@@ -491,84 +493,100 @@ void SceneAIAsn2::Update(double dt)
 
 
 
-		//if (magician->active) // Magician codes here
-		//{
-		//	if (magician->HP < 70)
-		//	{
-		//		if (magician->isHealTarget == false)
-		//		{
-		//			magician->isHealTarget = true;
-		//			msgBoard.addMessage("Magician", "Healer", "Heal Me...");
-		//		}
-		//	}
-		//	if (fireball->active)
-		//	{
-		//		for (std::vector<GameObject*>::iterator mob = m_goList.begin(); mob != m_goList.end(); mob++)
-		//		{
-		//			if (!(*mob)->active || (*mob)->job != GameObject::JOB_MOB)
-		//				continue;
-		//			if (DistXY(fireball->pos, (*mob)->pos) < 50.f)
-		//			{
-		//				(*mob)->HP -= fireball->Dmg;
-		//				fireball->active = false;
-		//				break;
-		//			}
-		//		}
-		//		if (DistXY(fireball->pos, EnemyTower->pos) < 50.f && EnemyTower->active)
-		//		{
-		//			EnemyTower->HP -= fireball->Dmg;
-		//			fireball->active = false;
-		//			//break;
-		//		}
-		//	}
-		//	if (magician->currentState == GameObject::STATE_MOVE)
-		//	{
-		//		magician->vel.Set(10, 0, 0);
-		//		for (std::vector<GameObject*>::iterator mob = m_goList.begin(); mob != m_goList.end(); mob++)
-		//		{
-		//			if (!(*mob)->active || (*mob)->job != GameObject::JOB_MOB && (*mob)->job != GameObject::JOB_ETOWER)
-		//				continue;
-		//			if ((*mob)->job == GameObject::JOB_MOB && DistXY(magician->pos, (*mob)->pos) < 200.f && (*mob)->active)
-		//			{
-		//				if (magicianRechargeTimer <= 0.f)
-		//				{
-		//					magician->currentState = GameObject::STATE_ATTACK;
-		//					magician->vel.SetZero();
-		//					break;
-		//				}
-		//			}
-		//			if ((*mob)->job == GameObject::JOB_ETOWER && DistXY(magician->pos, (*mob)->pos) < 1000.f && (*mob)->active)
-		//			{
-		//				if (magicianRechargeTimer <= 0.f)
-		//				{
-		//					magician->currentState = GameObject::STATE_ATTACK;
-		//					magician->vel.SetZero();
-		//					break;
-		//				}
-		//			}
-		//			
-		//		}
-		//	}
-		//	else if (magician->currentState == GameObject::STATE_ATTACK)
-		//	{
-		//		if (magicianRechargeTimer <= 0.f && !fireball->active)
-		//		{
-		//			msgBoard.addMessage("Magician","Everyone","Attacking the Enemy!");
-		//			fireball->pos = magician->pos;
-		//			fireball->active = true;
-		//			magicianRechargeTimer = 2.f;
-		//			magician->currentState = GameObject::STATE_RECHARGE;
-		//		}
-		//	}
-		//	else if (magician->currentState == GameObject::STATE_RECHARGE)
-		//	{
-		//		magicianRechargeTimer -= dt;
-		//		if (magicianRechargeTimer <= 0.f)
-		//		{
-		//			magician->currentState = GameObject::STATE_MOVE;
-		//		}
-		//	}
-		//}
+		if (magician->active) // Magician codes here
+		{
+			if (magician->HP > 0)
+			{
+				if (magician->HP < 70)
+				{
+					if (magician->isHealTarget == false)
+					{
+						magician->isHealTarget = true;
+						msgBoard.addMessage("Magician", "Healer", "Heal Me...");
+					}
+				}
+				if (fireball->active)
+				{
+					for (std::vector<GameObject*>::iterator mob = m_goList.begin(); mob != m_goList.end(); mob++)
+					{
+						if (!(*mob)->active || (*mob)->job != GameObject::JOB_MOB)
+							continue;
+						if (DistXY(fireball->pos, (*mob)->pos) < 50.f)
+						{
+							(*mob)->HP -= fireball->Dmg;
+							fireball->active = false;
+							break;
+						}
+					}
+					if (DistXY(fireball->pos, EnemyTower->pos) < 50.f && EnemyTower->active)
+					{
+						EnemyTower->HP -= fireball->Dmg;
+						fireball->active = false;
+						//break;
+					}
+				}
+				if (magician->currentState == GameObject::STATE_MOVE)
+				{
+					MagicianEnemy = false;
+					magician->vel.Set(10, 0, 0);
+					for (std::vector<GameObject*>::iterator mob = m_goList.begin(); mob != m_goList.end(); mob++)
+					{
+						if (!(*mob)->active || (*mob)->job != GameObject::JOB_MOB && (*mob)->job != GameObject::JOB_ETOWER)
+							continue;
+						if ((*mob)->job == GameObject::JOB_MOB && DistXY(magician->pos, (*mob)->pos) < 200.f && (*mob)->active)
+						{
+							///if (magicianRechargeTimer <= 0.f)
+							//{
+								MagicianEnemy = true;
+								magician->currentState = GameObject::STATE_ATTACK;
+								magician->vel.SetZero();
+								break;
+							///}
+						}
+						if ((*mob)->job == GameObject::JOB_ETOWER && DistXY(magician->pos, (*mob)->pos) < 1000.f && (*mob)->active)
+						{
+							///if (magicianRechargeTimer <= 0.f)
+							//{
+								MagicianEnemy = true;
+								magician->currentState = GameObject::STATE_ATTACK;
+								magician->vel.SetZero();
+								break;
+							//}
+						}
+
+					}
+				}
+				else if (magician->currentState == GameObject::STATE_ATTACK)
+				{
+					///if (magicianRechargeTimer <= 0.f && !fireball->active)
+					//{
+						if (MagicianAttack /*&& !fireball->active && MagicianEnemy*/)
+						{
+							msgBoard.addMessage("Magician", "Everyone", "Attacking the Enemy!");
+							fireball->pos = magician->pos;
+							fireball->active = true;
+							magicianRechargeTimer = 2.f;
+							MagicianAttack = false;
+							magician->currentState = GameObject::STATE_RECHARGE;
+						}
+					//}
+				}
+				else if (magician->currentState == GameObject::STATE_RECHARGE)
+				{
+					magicianRechargeTimer -= dt;
+					if (magicianRechargeTimer <= 0.f)
+					{
+						magician->currentState = GameObject::STATE_MOVE;
+					}
+				}
+			}
+			else
+			{
+				magician->currentState = GameObject::STATE_DEAD;
+				magician->active = false;
+			}
+			
+		}
 
 		//Healer Codes here
 		/*if (healer->active)
@@ -944,6 +962,10 @@ void SceneAIAsn2::RenderGO(GameObject *go)
 			else if (MagicianAnimCounter >= 2.f && MagicianAnimCounter < 3.f)
 				RenderMesh(meshList[GEO_MAGICIAN_SHOOT_FRAME2], false);
 		}
+		else if (magician->currentState == GameObject::STATE_RECHARGE)
+		{
+			RenderMesh(meshList[GEO_MAGICIAN_RECHARGE], false);
+		}
 		modelStack.PopMatrix();
 		break;
 	case GameObject::GO_ARROW:
@@ -1094,6 +1116,29 @@ void SceneAIAsn2::WarriorAnimation()
 					//msgBoard.addMessage("Archer", "Everyone", "Shooting down the Enemy!");
 				}
 
+			}
+		}
+	}
+}
+
+void SceneAIAsn2::MagicianAnimation()
+{
+	if (magician->currentState == GameObject::STATE_MOVE)
+	{
+		MagicianAnimCounter += 0.1f;
+		if (MagicianAnimCounter > 4)
+			MagicianAnimCounter = 0;
+	}
+	else if (magician->currentState == GameObject::STATE_ATTACK)
+	{
+		MagicianAnimCounter += 0.1f;
+		if (MagicianAnimCounter > 3)
+		{
+			if (MagicianAnimCounter >= 2.f/* && magicianRechargeTimer <= 0*/)
+			{
+				MagicianAttack = true;
+				msgBoard.addMessage("Archer", "Everyone", "Shooting down the Enemy!");
+				MagicianAnimCounter = 0;
 			}
 		}
 	}
